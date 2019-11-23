@@ -139,27 +139,26 @@ def takipedilenler():
 	result = cursor.fetchall()
 	return render_template('elements.html', data=result, len=len(result), low_limit=0, high_limit=5)
 
+
+
+
 @app.route('/mesaj', methods = ['GET', 'POST'])
 def mesaj():
-	if request.method == 'POST':
+	if request.method == 'GET':
 		username = request.cookies.get('username')
 		message_to = request.args.get('message_to')
+		if(message_to == None):
+			db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
+			cursor = db.cursor()
+			cursor.execute("SELECT * from konusma where kullanici_bir='"+str(username)+"' or kullanici_iki='"+str(username)+"';")
+			mesaj_data = cursor.fetchall() # Temizlenmesi gerek.
+			return render_template('mesaj.html', data=mesaj_data, len=len(mesaj_data), username=username, message_to=message_to)
+
 		db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
 		cursor = db.cursor()
 		cursor.execute("SELECT mesaji_atan, mesaj, mesaj_tarihi from mesaj where konusma_id_fk IN (SELECT konusma_id FROM konusma where (kullanici_bir='"+str(username)+"' OR kullanici_bir='"+str(message_to)+"') AND (kullanici_iki='"+str(message_to)+"' OR kullanici_iki='"+str(username)+"'));")
 		mesaj_data = cursor.fetchall() # Temizlenmesi gerek.
-		print(mesaj_data)
 		return render_template('mesaj.html', data=mesaj_data, len=len(mesaj_data), username=username, message_to=message_to)
-	if request.method == 'GET':
-		username = request.cookies.get('username')
-		db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
-		cursor = db.cursor()
-		cursor.execute("SELECT * from konusma where kullanici_bir='"+str(username)+"' or kullanici_iki='"+str(username)+"';")
-		mesaj_data = cursor.fetchall() # Temizlenmesi gerek.
-		print(mesaj_data)
-		message_to = "0"
-		return render_template('mesaj.html', data=mesaj_data, len=len(mesaj_data), username=username, message_to=message_to)
-
 ## Başkalarının ilanı görülecek. İlanları ekle. İlan yorumları
 
 
