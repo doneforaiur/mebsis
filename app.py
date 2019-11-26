@@ -7,6 +7,13 @@ import MySQLdb
 import hashlib
 app = Flask(__name__)
 
+def get_name(ogrenci_no):
+	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
+	cursor = db.cursor()
+	cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(ogrenci_no)+";")
+	username = cursor.fetchone()
+	username = username[0].capitalize().decode('utf8')
+	return username
 
 
 @app.route('/index.html',methods=['GET'])
@@ -19,30 +26,41 @@ def index():
 	cursor.execute("SELECT count(*) from firma")
 	firma_sayisi = cursor.fetchone()
 	if(request.cookies.get('username') != None):
-		return redirect(url_for('anasayfa')) 
-	return render_template('index.html', mezun=mezun_sayisi[0], firma=firma_sayisi[0])
+		return redirect(url_for('anasayfa'))
+	return render_template('index.html', mezun=mezun_sayisi[0], firma=firma_sayisi[0], username=None)
 
 
 @app.route('/contact.html',methods=['GET'])
 def contact():
-	return render_template('contact.html')
+	if(request.cookies.get('username') == None):
+		username = None
+	else:
+		username = request.cookies.get('username')
+		cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(username)+";")
+		username = cursor.fetchone()
+		username = username[0].capitalize().decode('utf8')
 
+	return render_template('contact.html', username=username)
 
 
 @app.route('/mezun_ara', methods=['GET', 'POST'])
-def show_post():
+def mezunlar():
 	if request.method == 'POST':
-		ogrenci_no1 = str(request.form['ogrenci_no'])
+		ogrenci_no1 = request.args.get('ogrenci_no')
 		page_number = str(request.form['page_number'])
 		page_number=int(page_number)-1
 
 	if request.method == 'GET':
-		ogrenci_no1=0
+		if(request.args.get('ogrenci_no') != None):
+			ogrenci_no1 = request.args.get('ogrenci_no')
+		else:
+			ogrenci_no1 = 0
 		page_number=0
-
 
 	db = MySQLdb.connect("localhost","misafir","misafir","mebsis" ,charset='utf8', init_command='SET NAMES UTF8')
 	cursor = db.cursor()
+	if(ogrenci_no1 == None):
+		ogrenci_no1 = 0
 	if(int(ogrenci_no1) == 0):
 		cursor.execute("SELECT *  from mezun LIMIT "+ str(page_number*20)+",20;")
 	else:
@@ -63,13 +81,18 @@ def show_post():
 	else:
 		low_limit=current_page-4
 		high_limit=current_page+5
-	return render_template('elements.html', data=rows, len=len(rows), page_number=page_number,current_page=current_page,
+	if(request.cookies.get('username') == None):
+		username = None
+	else:
+		username = request.cookies.get('username')
+		cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(username)+";")
+		username = cursor.fetchone()
+		username = username[0].capitalize().decode('utf8')
+	return render_template('elements.html', username=username, ogrenci_no=request.cookies.get('username'),data=rows, len=len(rows), page_number=page_number,current_page=current_page,
 											low_limit=low_limit, high_limit=high_limit)
 
 @app.route('/login', methods = ['GET','POST'])
 def login():
-	error = ''
-	# Error ekle.
 	username = request.form['username']
 	password = request.form['password']
 	db = MySQLdb.connect("localhost","misafir","misafir", "mebsis", charset='utf8', init_command='SET NAMES UTF8')
@@ -83,6 +106,7 @@ def login():
 		response.set_cookie('password', str(result[0]))
 	return response
 
+
 @app.route('/cikis_yap', methods= ['POST'])
 def cikis_yap():
 	resp = redirect(url_for('index'))
@@ -90,8 +114,11 @@ def cikis_yap():
 	resp.set_cookie('password', expires=0)
 	return resp
 
+
 @app.route('/anasayfa')
 def anasayfa():
+	if(request.cookies.get('username') == None):
+		return redirect(url_for('index'))
 	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
 	cursor = db.cursor()
 	cursor.execute("SELECT count(*) from mezun")
@@ -99,10 +126,10 @@ def anasayfa():
 	cursor.execute("SELECT count(*) from firma")
 	firma_sayisi = cursor.fetchone()
 	username = request.cookies.get('username')
-	cursor.execute("SELECT isim from mezun where ogrenci_no=" +username+";")
-	username = cursor.fetchone()
-	username = username[0].capitalize().decode('utf8')
-	return render_template('anasayfa.html',username=username,ogrenci_no=request.cookies.get('username'),mezun=mezun_sayisi[0], firma=firma_sayisi[0])
+	if(username != None):
+		userno = request.cookies.get('username')
+		username = get_name(userno)
+	return render_template('anasayfa.html',username=username,ogrenci_no=userno, mezun=mezun_sayisi[0], firma=firma_sayisi[0])
 
 @app.route('/profil', methods=['GET', 'POST'])
 def profil():
@@ -117,7 +144,12 @@ def profil():
 	firma = firma[0]
 	isim = ogrenci[1].capitalize()
 	soyad = ogrenci[2].capitalize()
-	return render_template('profil.html', ogrenci_no=ogrenci_no, isim=isim.decode('latin1'), soyad=soyad.decode('latin1'), firma=firma)
+	if(request.cookies.get('username') == None):
+		username = None
+	else:
+		userno = request.cookies.get('username')
+		username = get_name(userno)
+	return render_template('profil.html', username=username, ogrenci_no=ogrenci_no, isim=isim.decode('latin1'), soyad=soyad.decode('latin1'), firma=firma)
 
 @app.route('/takipciler', methods=['GET'])
 def takipciler():
@@ -126,7 +158,12 @@ def takipciler():
 	cursor = db.cursor()
 	cursor.execute("SELECT ogrenci_no, isim, soyad from mezun where ogrenci_no IN (SELECT follower_id FROM takip WHERE following_id='" +str(ogrenci_no)+"');")
 	result = cursor.fetchall()
-	return render_template('elements.html', data=result, len=len(result), low_limit=0, high_limit=0)
+	if(request.cookies.get('username') == None):
+		username = None
+	else:
+		userno = request.cookies.get('username')
+		username = get_name(userno)
+	return render_template('elements.html', username=username,ogrenci_no=userno,data=result, len=len(result), low_limit=0, high_limit=0)
 
 
 @app.route('/takipedilenler', methods=['GET'])
@@ -136,9 +173,12 @@ def takipedilenler():
 	cursor = db.cursor()
 	cursor.execute("SELECT ogrenci_no, isim, soyad from mezun where ogrenci_no IN (SELECT following_id FROM takip WHERE follower_id='" +str(ogrenci_no)+"');")
 	result = cursor.fetchall()
-	return render_template('elements.html', data=result, len=len(result), low_limit=0, high_limit=0)
-
-
+	if(request.cookies.get('username') == None):
+		username = None
+	else:
+		userno = request.cookies.get('username')
+		username = get_name(userno)
+	return render_template('elements.html',username=username,ogrenci_no=userno, data=result, len=len(result), low_limit=0, high_limit=0)
 
 
 @app.route('/mesaj', methods = ['GET', 'POST'])
@@ -146,6 +186,8 @@ def mesaj():
 	if request.method == 'GET':
 		username = request.cookies.get('username')
 		message_to = request.args.get('message_to')
+		if(username == None):
+			return redirect(url_for('anasayfa'))
 		if(message_to == None):
 			db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
 			cursor = db.cursor()
@@ -160,7 +202,7 @@ def mesaj():
 				cursor.execute("SELECT isim, soyad from mezun where ogrenci_no='"+mesaj_data_list[i][1]+"';")
 				message_to_name.append(cursor.fetchone())
 			return render_template('mesaj.html', data=mesaj_data_list, len=len(mesaj_data),message_to_name=message_to_name, username=username, message_to=message_to)
-
+		
 		db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
 		cursor = db.cursor()
 		cursor.execute("SELECT mesaji_atan, mesaj, mesaj_tarihi from mesaj where konusma_id_fk IN (SELECT konusma_id FROM konusma where (kullanici_bir='"+str(username)+"' OR kullanici_bir='"+str(message_to)+"') AND (kullanici_iki='"+str(message_to)+"' OR kullanici_iki='"+str(username)+"'));")
