@@ -121,7 +121,9 @@ body {
 <div name="chat" class="chat" onClick="scrollToBottom('chat')">
 
 {% if message_to != None %}	
-<a href="/mesaj" class="previous round">&#8249;</a>
+<a href="/mesaj" class="previous round"><b>&#8249;</b></a>
+{% else %}
+<a href="/anasayfa" class="previous round"><b>&#8249;</b></a>
 {% endif %}
 
 

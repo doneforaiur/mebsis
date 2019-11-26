@@ -37,11 +37,14 @@
         <div class="header-area ">
             <div id="sticky-header" class="main-header-area">
                 <div class="container-fluid p-0">
-                    <div class="row align-items-center no-gutters">
+                    <div class="row align-items-center">
                         <div class="col-xl-2 col-lg-2">
                             <div class="logo-img">
                                 <a href="index.html">
-                                    <img src="{{ url_for('static', filename="img/logo.png")}}" alt="">
+                                    <img src="{{ url_for('static', filename="img/logo1.png")}}" alt=""> 
+										<div class="main-menu  d-none d-lg-block">
+											<font size=+2 color="white">KTÜ Mezunları</font> 
+										</div>
                                 </a>
                             </div>
                         </div>
@@ -49,37 +52,35 @@
                             <div class="main-menu  d-none d-lg-block">
                                 <nav>
                                     <ul id="navigation">
-                                        <li><a href="index.html">home</a></li>
-                                        <li><a href="Courses.html">Courses</a></li>
-                                        <li><a class="active" href="#">pages <i class="ti-angle-down"></i></a>
+                                        <li><a href="anasayfa">Anasayfa</a></li>
+                                        <li><a href="/mezun_ara">Mezunlarımız</a></li>
+                                        <li><a href="#"><b> İlanlar </b><i class="ti-angle-down"></i></a>
                                             <ul class="submenu">
-                                                <li><a href="course_details.html">course details</a></li>
-                                                <li><a href="elements.html">elements</a></li>
+                                                <li><a href="ilan?ilan_turu=standart">İş İlanları</a></li>
+                                                <li><a href="ilan?ilan_turu=staj">Staj İlanları</a></li>
                                             </ul>
                                         </li>
-                                        <li><a href="about.html">About</a></li>
-                                        <li><a href="#">blog <i class="ti-angle-down"></i></a>
-                                            <ul class="submenu">
-                                                <li><a href="blog.html">blog</a></li>
-                                                <li><a href="single-blog.html">single-blog</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="contact.html">Contact</a></li>
+                                        <li><a href="/mesaj">Mesajlar</a></li>
+                                        <li><a href="about.html">Hakkımızda</a></li>
+                                        
+                                        <li><a href="contact.html">İletişim</a></li>
                                     </ul>
                                 </nav>
                             </div>
                         </div>
                         <div class="col-xl-3 col-lg-3 d-none d-lg-block">
                             <div class="log_chat_area d-flex align-items-center">
-                                <a href="#test-form" class="login popup-with-form">
+                                <a  href="/profil?ogrenci_no={{ogrenci_no}}" class="genric-btn primary circle">
                                     <i class="flaticon-user"></i>
-                                    <span>log in</span>
+                                    <span>{{username}}</span>
                                 </a>
                                 <div class="live_chat_btn">
-                                    <a class="boxed_btn_orange" href="#">
-                                        <i class="fa fa-phone"></i>
-                                        <span>+10 378 467 3672</span>
+									<form id="mezun" name="cikis_yap" action="/cikis_yap" method="post">
+                                    <a  onClick="document.forms['cikis_yap'].submit();" class="genric-btn danger circle">
+                                        <span>Çıkış yap...</span>
+										<a type="input" name="username" valeu="{{username}}">
                                     </a>
+									</form>
                                 </div>
                             </div>
                         </div>
