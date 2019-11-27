@@ -36,6 +36,8 @@ def contact():
 		username = None
 	else:
 		username = request.cookies.get('username')
+		db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
+		cursor = db.cursor()		
 		cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(username)+";")
 		username = cursor.fetchone()
 		username = username[0].capitalize().decode('utf8')
@@ -129,7 +131,42 @@ def anasayfa():
 	if(username != None):
 		userno = request.cookies.get('username')
 		username = get_name(userno)
-	return render_template('anasayfa.html',username=username,ogrenci_no=userno, mezun=mezun_sayisi[0], firma=firma_sayisi[0])
+	
+	cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
+	
+	ilanlar = cursor.fetchall()
+	ilanlar = list(map(list, ilanlar))
+	
+	return render_template('anasayfa.html',aktif=False,ilanlar=ilanlar, len=len(ilanlar), username=username,ogrenci_no=userno)
+
+
+@app.route('/ilan')
+def ilan():
+	userno = request.cookies.get('username')
+	username = get_name(userno)
+	
+	ilan_turu = request.args.get('ilan_turu')
+	if(ilan_turu == "standart"):
+		ilan_turu = 1
+	elif(ilan_turu == "staj"):
+		ilan_turu = 0
+	else:
+		ilan_turu = None
+		
+	cursor = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' ).cursor()
+	if(ilan_turu == None):
+		cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk;")
+	else:
+				cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan_tipi='"+str(ilan_turu)+"';")
+	
+	ilanlar = cursor.fetchall() # Mezunlardaki gibi pagination yap.
+	ilanlar = list(map(list, ilanlar))
+	print(len(ilanlar))
+	return render_template('anasayfa.html',aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+
+
+
+
 
 @app.route('/profil', methods=['GET', 'POST'])
 def profil():
@@ -149,7 +186,7 @@ def profil():
 	else:
 		userno = request.cookies.get('username')
 		username = get_name(userno)
-	return render_template('profil.html', username=username, ogrenci_no=ogrenci_no, isim=isim.decode('latin1'), soyad=soyad.decode('latin1'), firma=firma)
+	return render_template('profil.html', username=username, userno=userno,ogrenci_no=ogrenci_no, isim=isim.decode('latin1'), soyad=soyad.decode('latin1'), firma=firma)
 
 @app.route('/takipciler', methods=['GET'])
 def takipciler():
