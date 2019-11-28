@@ -154,18 +154,23 @@ def ilan():
 		ilan_turu = None
 		
 	cursor = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' ).cursor()
+
+	if(request.args.get('ilan_no') != None):
+		ilan_no = str(request.args.get('ilan_no'))
+		cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun WHERE ogrenci_no IN (select ilani_acan_fk from ilan where ilan_id='"+ilan_no+"');")
+		ilanlar = cursor.fetchall()
+		ilanlar = list(map(list, ilanlar))
+		return render_template('anasayfa.html',aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+
 	if(ilan_turu == None):
-		cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk;")
+		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk;")
 	else:
-				cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan_tipi='"+str(ilan_turu)+"';")
+		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan_tipi='"+str(ilan_turu)+"';")
+	
 	
 	ilanlar = cursor.fetchall() # Mezunlardaki gibi pagination yap.
 	ilanlar = list(map(list, ilanlar))
-	print(len(ilanlar))
 	return render_template('anasayfa.html',aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
-
-
-
 
 
 @app.route('/profil', methods=['GET', 'POST'])
@@ -218,9 +223,9 @@ def takipedilenler():
 	return render_template('elements.html',username=username,ogrenci_no=userno, data=result, len=len(result), low_limit=0, high_limit=0)
 
 
-@app.route('/mesaj', methods = ['GET', 'POST'])
+@app.route('/mesaj', methods = ["POST","GET"])
 def mesaj():
-	if request.method == 'GET':
+	if request.method == "GET":
 		username = request.cookies.get('username')
 		message_to = request.args.get('message_to')
 		if(username == None):
@@ -246,7 +251,7 @@ def mesaj():
 		mesaj_data = cursor.fetchall() # Temizlenmesi gerek.
 		return render_template('mesaj.html', data=mesaj_data, len=len(mesaj_data), username=username, message_to=message_to)
 
-	if request.method == 'POST':
+	if request.method == "POST":
 		username = request.cookies.get('username')
 		message_to = request.args.get('message_to')
 		message = request.form['cevap']
@@ -254,6 +259,10 @@ def mesaj():
 		cursor = db.cursor()
 		cursor.execute("SELECT konusma_id FROM konusma where (kullanici_bir='"+str(username)+"' OR kullanici_bir='"+str(message_to)+"') AND (kullanici_iki='"+str(message_to)+"' OR kullanici_iki='"+str(username)+"');")
 		konusma_id_fk = cursor.fetchone() # Temizlenmesi gerek.
+		if(konusma_id_fk == None):
+			cursor.execute("INSERT INTO konusma(kullanici_bir, kullanici_iki) VALUES ('"+str(username)+"','"+str(message_to)+"');")	
+			db.commit()
+			konusma_id_fk = cursor.execute("SELECT konusma_id FROM konusma where (kullanici_bir='"+str(username)+"' OR kullanici_bir='"+str(message_to)+"') AND (kullanici_iki='"+str(message_to)+"' OR kullanici_iki='"+str(username)+"');")
 		cursor.execute("INSERT INTO mesaj(konusma_id_fk, mesaji_atan, mesaj) VALUES ('"+str(konusma_id_fk[0])+"','"+str(username)+"','"+str(message)+"');")	
 		db.commit()
 		cursor.execute("SELECT mesaji_atan, mesaj, mesaj_tarihi from mesaj where konusma_id_fk IN (SELECT konusma_id FROM konusma where (kullanici_bir='"+str(username)+"' OR kullanici_bir='"+str(message_to)+"') AND (kullanici_iki='"+str(message_to)+"' OR kullanici_iki='"+str(username)+"'));")
