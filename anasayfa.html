@@ -27,6 +27,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename="css/slicknav.css")}}">
     <link rel="stylesheet" href="{{ url_for('static', filename="css/style.css")}}">
     <!-- <link rel="stylesheet" href="css/responsive.css"> -->
+    <style>
+    .alignleft {
+				float: left;
+			}
+			.alignright {
+				float: right;
+			}
+    </style>
 </head>
 
 <body>
@@ -54,9 +62,17 @@
                             <div class="main-menu  d-none d-lg-block">
                                 <nav>
                                     <ul id="navigation">
-                                        <li><a class="active" href="anasayfa">Anasayfa</a></li>
+                                    		{% if aktif == True %}
+                                        	<li><a href="anasayfa">Anasayfa</a></li>
+                                        {% else %}
+                                        	<li><a class="active" href="anasayfa">Anasayfa</a></li>	
+                                        {% endif %}
                                         <li><a href="/mezun_ara">Mezunlarımız</a></li>
+                                        {% if aktif == True %}
+                                        <li><a class="active"><b> İlanlar </b><i class="ti-angle-down"></i></a>
+                                        {% else %}
                                         <li><a><b> İlanlar </b><i class="ti-angle-down"></i></a>
+                                        {% endif %}
                                             <ul class="submenu">
                                                 <li><a href="ilan?ilan_turu=standart">İş İlanları</a></li>
                                                 <li><a href="ilan?ilan_turu=staj">Staj İlanları</a></li>
@@ -108,6 +124,8 @@
 
 
 	<!-- anasayfa ilanlar-->
+	
+{% for i in range(0, len) %} 
 	<div class="courses_details_info">
         <div class="container">
             <div class="row">
@@ -118,10 +136,14 @@
                                 <div class="thumb">
                                         <img src="{{ url_for('static', filename="img/latest_blog/author.png")}}" alt="">
                                 </div>
-                                <div class="name">
-                                    <h3>{{ isim }} {{ soyad }}</h3>
-                                    <p>{{ ogrenci_no }}</p>
-                                </div>
+		                             <a href="/profil?ogrenci_no={{ilanlar[i][2]}}">
+				                            <div  class="name">
+				                                <h3 class="alignleft">{{ ilanlar[i][0] }} {{ ilanlar[i][1] }}</h3>
+				                                <p font="-2" class="alignright">{{ ilanlar[i][3] }}</a>
+																				<div style="clear: both;"></div>
+				                                <p>{{ ilanlar[i][2] }}</p>
+				                            </div>
+			                           </a>
                             </div>
                             <p class="text_info">
                                 Our set he for firmament morning sixth subdue darkness creeping gathered divide our let
@@ -134,25 +156,13 @@
                                 <li><a href="#"> <i class="ti-linkedin"></i> </a></li>
                             </ul>
                         </div>
-                        <div class="feedback_info">
-               
-                            <p>Your rating</p>
-                            <i class="flaticon-mark-as-favorite-star"></i>
-                            <i class="flaticon-mark-as-favorite-star"></i>
-                            <i class="flaticon-mark-as-favorite-star"></i>
-                            <i class="flaticon-mark-as-favorite-star"></i>
-                            <i class="flaticon-mark-as-favorite-star"></i>
-                            
-                        <form action="#">
-                                <textarea name="" id="" cols="2" rows="1" placeholder="Write your feedback"></textarea>
-                                <button type="submit" class="boxed_btn">Submit</button>
-                            </form>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
+{% endfor %}
 	<!-- anasayfa ilanlar-->
 
     <!-- JS here -->
