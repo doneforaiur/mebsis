@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename="css/style.css")}}">
     <!-- <link rel="stylesheet" href="css/responsive.css"> -->
     <style>
-    .alignleft {
+			.alignleft {
 				float: left;
 			}
 			.alignright {
@@ -69,14 +69,14 @@
                                         {% endif %}
                                         <li><a href="/mezun_ara">Mezunlarımız</a></li>
                                         {% if aktif == True %}
-                                        <li><a class="active"><b> İlanlar </b><i class="ti-angle-down"></i></a>
+                                        	<li><a class="active"><b> İlanlar </b><i class="ti-angle-down"></i></a>
                                         {% else %}
-                                        <li><a><b> İlanlar </b><i class="ti-angle-down"></i></a>
+                                        	<li><a><b> İlanlar </b><i class="ti-angle-down"></i></a>
                                         {% endif %}
-                                            <ul class="submenu">
-                                                <li><a href="ilan?ilan_turu=standart">İş İlanları</a></li>
-                                                <li><a href="ilan?ilan_turu=staj">Staj İlanları</a></li>
-                                            </ul>
+                                          <ul class="submenu">
+                                              <li><a href="ilan?ilan_turu=standart">İş İlanları</a></li>
+                                              <li><a href="ilan?ilan_turu=staj">Staj İlanları</a></li>
+                                          </ul>
                                         </li>
                                         <li><a href="/mesaj">Mesajlar</a></li>
                                         <li><a href="about.html">Hakkımızda</a></li>
@@ -141,7 +141,7 @@
 				                                <h3 class="alignleft">{{ ilanlar[i][0] }} {{ ilanlar[i][1] }}</h3>
 				                                <p font="-2" class="alignright">{{ ilanlar[i][3] }}</a>
 																				<div style="clear: both;"></div>
-				                                <p>{{ ilanlar[i][2] }}</p>
+				                                <p>#{{ ilanlar[i][2] }} Paylaşım tarihi; {{ ilanlar[i][4]}}</p>
 				                            </div>
 			                           </a>
                             </div>
@@ -155,6 +155,30 @@
                                 <li><a href="#"> <i class="fa fa-twitter"></i> </a></li>
                                 <li><a href="#"> <i class="ti-linkedin"></i> </a></li>
                             </ul>
+                            <a id="click" name="{{ilanlar[i][3]}}" onclick="myFunction({{ilanlar[i][3]}})" href="javascript:void();">Yorumlar...</a>
+                        <div class="container">
+                        	<div id="yorum" name="{{ilanlar[i][3]}}" style="display: none;">
+                              
+                            <div class="author_info" style="margin-top: 10px">
+                            <div class="auhor_header">
+                              
+                              <div class="thumb">
+                            	  <img src="{{ url_for('static', filename="img/latest_blog/author.png")}}" alt="">
+                              </div>
+	                        	     <a href="/profil?ogrenci_no={{ilanlar[i][2]}}">
+		                    		        <div  class="name">
+		                    		            <h3 class="alignleft">{{ ilanlar[i][0] }} {{ ilanlar[i][1] }}</h3>
+				                                <p font="-2" class="alignright">{{ ilanlar[i][3] }}</a>
+																				<div style="clear: both;"></div>
+				                                <p>#{{ ilanlar[i][2] }} {{ ilanlar[i][4]}}</p>
+				                            </div>
+			                           </a>
+                            </div>
+                            </div>
+                            </div>
+                        	</div>
+                        </div>
+                        
                         </div>
                     </div>
                 </div>
@@ -163,6 +187,8 @@
     </div>
     
 {% endfor %}
+
+
 	<!-- anasayfa ilanlar-->
 
     <!-- JS here -->
@@ -193,6 +219,12 @@
     <script src="{{ url_for('static', filename="js/mail-script.js")}}"></script>
 
     <script src="{{ url_for('static', filename="js/main.js")}}"></script>
+    <script>
+    function myFunction(ilan_id) {
+					$('div[name = "'+ilan_id+'"]').toggle('ease');
+
+		}
+    </script>
 </body>
 
 </html>
