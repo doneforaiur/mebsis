@@ -182,16 +182,20 @@ def profil():
 	ogrenci = cursor.fetchone()
 
 	cursor.execute("SELECT unvan from firma where ticari_sicil='"+str(ogrenci[10])+"';")
-	firma = cursor.fetchone()
+	firma = cursor.fetchone() # TODO; Düzeltilmesi gerekiyor.
 	firma = firma[0]
 	isim = ogrenci[1].capitalize()
 	soyad = ogrenci[2].capitalize()
+	
 	if(request.cookies.get('username') == None):
 		username = None
 	else:
 		userno = request.cookies.get('username')
 		username = get_name(userno)
-	return render_template('profil.html', username=username, userno=userno,ogrenci_no=ogrenci_no, isim=isim.decode('latin1'), soyad=soyad.decode('latin1'), firma=firma)
+		
+	cursor.execute("SELECT ogrenci_no from mezun where ogrenci_no IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
+	takip_edilenler = cursor.fetchall()
+	return render_template('profil.html',takip_edilenler=str(takip_edilenler), username=username, userno=userno,ogrenci_no=ogrenci_no, isim=isim.decode('latin1'), soyad=soyad.decode('latin1'), firma=firma)
 
 @app.route('/takipciler', methods=['GET'])
 def takipciler():
@@ -222,6 +226,26 @@ def takipedilenler():
 		username = get_name(userno)
 	return render_template('elements.html',username=username,ogrenci_no=userno, data=result, len=len(result), low_limit=0, high_limit=0)
 
+@app.route('/takip_et', methods = ['GET'])
+def takip_et():
+	ogrenci_no = request.args.get('ogrenci_no')
+	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
+	cursor = db.cursor()
+	userno = request.cookies.get('username')
+	cursor.execute("INSERT INTO takip(follower_id, following_id) VALUES('"+str(userno)+"','"+str(ogrenci_no)+"')")
+	db.commit()
+	return redirect(url_for('profil', ogrenci_no=ogrenci_no))
+	
+@app.route('/takipten_cikar', methods = ['GET'])
+def takipten_cikar():
+	ogrenci_no = request.args.get('ogrenci_no')
+	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
+	cursor = db.cursor()
+	userno = request.cookies.get('username')
+	cursor.execute("delete from takip where follower_id='"+str(userno)+"' and following_id='"+str(ogrenci_no)+"'")
+	db.commit()
+	return redirect(url_for('profil', ogrenci_no=ogrenci_no))
+	
 
 @app.route('/mesaj', methods = ["POST","GET"])
 def mesaj():
