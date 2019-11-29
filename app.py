@@ -25,9 +25,11 @@ def index():
 	mezun_sayisi = cursor.fetchone()
 	cursor.execute("SELECT count(*) from firma")
 	firma_sayisi = cursor.fetchone()
+	cursor.execute("SELECT count(*) from ilan")
+	ilan_sayisi = cursor.fetchone()
 	if(request.cookies.get('username') != None):
 		return redirect(url_for('anasayfa'))
-	return render_template('index.html', mezun=mezun_sayisi[0], firma=firma_sayisi[0], username=None)
+	return render_template('index.html', ilan_sayisi=ilan_sayisi[0],mezun=mezun_sayisi[0], firma=firma_sayisi[0], username=None)
 
 
 @app.route('/contact.html',methods=['GET'])
@@ -132,10 +134,10 @@ def anasayfa():
 		userno = request.cookies.get('username')
 		username = get_name(userno)
 	
-	cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
-	
+	cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
 	ilanlar = cursor.fetchall()
 	ilanlar = list(map(list, ilanlar))
+	print(ilanlar)
 	
 	return render_template('anasayfa.html',aktif=False,ilanlar=ilanlar, len=len(ilanlar), username=username,ogrenci_no=userno)
 
@@ -161,11 +163,11 @@ def ilan():
 		ilanlar = cursor.fetchall()
 		ilanlar = list(map(list, ilanlar))
 		return render_template('anasayfa.html',aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
-
+	
 	if(ilan_turu == None):
-		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk;")
+		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk;")
 	else:
-		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan_tipi='"+str(ilan_turu)+"';")
+		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id,acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan_tipi='"+str(ilan_turu)+"';")
 	
 	
 	ilanlar = cursor.fetchall() # Mezunlardaki gibi pagination yap.
@@ -294,7 +296,6 @@ def mesaj():
 		return render_template('mesaj.html', data=mesaj_data, len=len(mesaj_data), username=username, message_to=message_to)
 		
 
-## Başkalarının ilanı görülecek. İlanları ekle. İlan yorumları
 
 
 if __name__ == '__main__':
