@@ -137,8 +137,8 @@
                                         <img src="{{ url_for('static', filename="img/latest_blog/author.png")}}" alt="">
                                 </div>
 		                             <a href="/profil?ogrenci_no={{ilanlar[i][2]}}">
-				                            <div  class="name">
-				                                <h3 class="alignleft">{{ ilanlar[i][0] }} {{ ilanlar[i][1] }}</h3>
+				                            <div  class="name">  
+				                                <h3 class="alignleft">{{ ilanlar[i][0].capitalize().encode('utf-8') }} {{ ilanlar[i][1] }}</h3>
 				                                <p font="-2" class="alignright">{{ ilanlar[i][3] }}</a>
 																				<div style="clear: both;"></div>
 				                                <p>#{{ ilanlar[i][2] }} Paylaşım tarihi; {{ ilanlar[i][4]}}</p>
@@ -155,31 +155,54 @@
                                 <li><a href="#"> <i class="fa fa-twitter"></i> </a></li>
                                 <li><a href="#"> <i class="ti-linkedin"></i> </a></li>
                             </ul>
+
                             <a id="click" name="{{ilanlar[i][3]}}" onclick="myFunction({{ilanlar[i][3]}})" href="javascript:void();">Yorumlar...</a>
+		                   
+		                   
                         <div class="container">
+                        	
+                        	
+                     {% for j in range(0, yorum_len) %}
+                        
+                        {% if ilanlar[i][3] == yorumlar[j][1] %}
                         	<div id="yorum" name="{{ilanlar[i][3]}}" style="display: none;">
                               
-                            <div class="author_info" style="margin-top: 10px">
+                            <div class="author_info" style="margin-top: 10px; margin-bottom:10px">
                             <div class="auhor_header">
                               
                               <div class="thumb">
                             	  <img src="{{ url_for('static', filename="img/latest_blog/author.png")}}" alt="">
                               </div>
-	                        	     <a href="/profil?ogrenci_no={{ilanlar[i][2]}}">
+	                        	     <a href="/profil?ogrenci_no={{yorumlar[j][3]}}">
 		                    		        <div  class="name">
-		                    		            <h3 class="alignleft">{{ ilanlar[i][0] }} {{ ilanlar[i][1] }}</h3>
-				                                <p font="-2" class="alignright">{{ ilanlar[i][3] }}</a>
-																				<div style="clear: both;"></div>
-				                                <p>#{{ ilanlar[i][2] }} {{ ilanlar[i][4]}}</p>
+		                    		            <h3>{{ yorumlar[j][4] }}</h3>
+				                                <p>#{{ yorumlar[j][2] }} {{yorumlar[j][3]}}</p>
 				                            </div>
 			                           </a>
+	                           <p class="text_info">
+                                {{ yorumlar[j][0] }}
+                            </p>
                             </div>
                             </div>
                             </div>
-                        	</div>
+                        {% endif %}
+          
+          
+                      {%  endfor  %}
+          
+                                  
+                      <div class="feedback_info" name="{{ilanlar[i][3]}}" style="display:none;">
+            <form action="yorum_yaz" method="post">
+                    <textarea name="yorum" id="yorum" cols="30" rows="3" placeholder="Yorumunuz..."></textarea>
+                    <input type="hidden" name="ilan_no" value="{{ ilanlar[i][3] }}""></input>
+                    <button type="submit" class="boxed_btn">Yorum Yaz</button>
+                </form>
+          	</div>
+                      
+	                        </div>
+                        </div>
                         </div>
                         
-                        </div>
                     </div>
                 </div>
             </div>

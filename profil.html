@@ -100,7 +100,7 @@
              <div class="row">
                  <div class="col-xl-20">
                      <div class="course_text">
-                            <h3>{{isim}} {{soyad}}</h3>
+                            <h3>{{ isim.decode('utf8')}} {{soyad.decode('utf8') }}</h3>
                             <div class="prise">
                                 <span class="active">Şu anda çalıştığı firma; {{firma}}</span>
                             </div>
@@ -217,7 +217,7 @@
                                         <img src="{{ url_for('static', filename="img/latest_blog/author.png")}}" alt="">
                                 </div>
                                 <div class="name">
-                                    <h3>{{ isim }} {{ soyad }}</h3>
+                                    <h3>{{ isim.decode('utf8') }} {{ soyad.decode('utf8') }}</h3>
                                     <p>{{ ogrenci_no }}</p>
                                 </div>
                             </div>
