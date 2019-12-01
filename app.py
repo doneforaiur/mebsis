@@ -7,6 +7,9 @@ import MySQLdb
 import hashlib
 app = Flask(__name__)
 
+
+
+
 def get_name(ogrenci_no):
 	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
 	cursor = db.cursor()
@@ -125,10 +128,7 @@ def anasayfa():
 		return redirect(url_for('index'))
 	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
 	cursor = db.cursor()
-	cursor.execute("SELECT count(*) from mezun")
-	mezun_sayisi = cursor.fetchone()
-	cursor.execute("SELECT count(*) from firma")
-	firma_sayisi = cursor.fetchone()
+
 	username = request.cookies.get('username')
 	if(username != None):
 		userno = request.cookies.get('username')
@@ -137,9 +137,14 @@ def anasayfa():
 	cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
 	ilanlar = cursor.fetchall()
 	ilanlar = list(map(list, ilanlar))
-	print(ilanlar)
 	
-	return render_template('anasayfa.html',aktif=False,ilanlar=ilanlar, len=len(ilanlar), username=username,ogrenci_no=userno)
+	yorumlar = ()
+	for i in range(0,len(ilanlar)):
+		yorumlar += (ilanlar[i][3],) # Tuple...
+	
+	cursor.execute("select yorum_text, ilan_id_fk, yorum_tarihi,ogrenci_id_fk from yorum where ilan_id_fk IN (" + ','.join(map(str, yorumlar)) +")")
+	yorumlar = cursor.fetchall()
+	return render_template('anasayfa.html',yorumlar=yorumlar, yorum_len=len(yorumlar), aktif=False,ilanlar=ilanlar, len=len(ilanlar), username=username,ogrenci_no=userno)
 
 
 @app.route('/ilan')
@@ -170,15 +175,38 @@ def ilan():
 		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id,acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan_tipi='"+str(ilan_turu)+"';")
 	
 	
+	
 	ilanlar = cursor.fetchall() # Mezunlardaki gibi pagination yap.
 	ilanlar = list(map(list, ilanlar))
-	return render_template('anasayfa.html',aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+	
+	yorumlar = ()
+	for i in range(0,len(ilanlar)):
+		yorumlar += (ilanlar[i][3],) # Tuple...
+	
+	cursor.execute("select yorum_text, ilan_id_fk, yorum_tarihi,ogrenci_id_fk from yorum where ilan_id_fk IN (" + ','.join(map(str, yorumlar)) +")")
+	yorumlar = cursor.fetchall()
+	return render_template('anasayfa.html',yorumlar=yorumlar, yorum_len=len(yorumlar), aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+
+
+
+@app.route('/yorum_yaz', methods = ['POST'])
+def yorum_yaz():
+	if request.method == "POST":  # Bu check çok da gerekli değil.
+		yorum = request.form['yorum']
+		ilan_no = request.form['ilan_no']
+		userno = request.cookies.get('username')
+		db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
+		cursor = db.cursor()
+		cursor.execute("insert into yorum(ilan_id_fk, ogrenci_id_fk, yorum_text) VALUES('"+ilan_no+"','"+userno+"','"+yorum+"')")
+		db.commit()
+		
+		return redirect(url_for('anasayfa'))
 
 
 @app.route('/profil', methods=['GET', 'POST'])
 def profil():
 	ogrenci_no = request.args.get('ogrenci_no')
-	db = MySQLdb.connect("localhost","misafir","misafir","mebsis")
+	db = MySQLdb.connect("localhost","misafir","misafir","mebsis" ,charset='utf8', init_command='SET NAMES UTF8')
 	cursor = db.cursor()
 	cursor.execute("SELECT * from mezun where ogrenci_no=" +str(ogrenci_no)+";")
 	ogrenci = cursor.fetchone()
@@ -186,8 +214,9 @@ def profil():
 	cursor.execute("SELECT unvan from firma where ticari_sicil='"+str(ogrenci[10])+"';")
 	firma = cursor.fetchone() # TODO; Düzeltilmesi gerekiyor.
 	firma = firma[0]
-	isim = ogrenci[1].capitalize()
-	soyad = ogrenci[2].capitalize()
+	isim = ogrenci[1]
+	soyad = ogrenci[2]
+
 	
 	if(request.cookies.get('username') == None):
 		username = None
@@ -197,7 +226,7 @@ def profil():
 		
 	cursor.execute("SELECT ogrenci_no from mezun where ogrenci_no IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
 	takip_edilenler = cursor.fetchall()
-	return render_template('profil.html',takip_edilenler=str(takip_edilenler), username=username, userno=userno,ogrenci_no=ogrenci_no, isim=isim.decode('latin1'), soyad=soyad.decode('latin1'), firma=firma)
+	return render_template('profil.html',takip_edilenler=str(takip_edilenler), username=username, userno=userno,ogrenci_no=ogrenci_no, isim=isim.capitalize().encode('utf-8'), soyad=soyad.encode('utf-8'), firma=firma)
 
 @app.route('/takipciler', methods=['GET'])
 def takipciler():
@@ -281,6 +310,7 @@ def mesaj():
 		username = request.cookies.get('username')
 		message_to = request.args.get('message_to')
 		message = request.form['cevap']
+		message = message.encode('utf8')
 		db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
 		cursor = db.cursor()
 		cursor.execute("SELECT konusma_id FROM konusma where (kullanici_bir='"+str(username)+"' OR kullanici_bir='"+str(message_to)+"') AND (kullanici_iki='"+str(message_to)+"' OR kullanici_iki='"+str(username)+"');")
