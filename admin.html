@@ -1,0 +1,114 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+<head>
+    <meta charset="utf-8">
+
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>KTÜ Mezunları</title>
+    <meta name="description" content="Karadeniz Teknik Üniversitesi Mezunları">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- <link rel="manifest" href="site.webmanifest"> -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="img/logo1.png")}}">
+    <!-- Place favicon.ico in the root directory -->
+
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/bootstrap.min.css")}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/owl.carousel.min.css")}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/magnific-popup.css")}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/font-awesome.min.css")}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/themify-icons.css")}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/nice-select.css")}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/flaticon.css")}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/gijgo.css")}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/animate.css")}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/slicknav.css")}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/style.css")}}">
+    <!-- <link rel="stylesheet" href="css/responsive.css"> -->
+    <style>
+			.alignleft {
+				float: left;
+			}
+			.alignright {
+				float: right;
+			}
+    </style>
+</head>
+
+<body>
+    <!--[if lte IE 9]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+    <![endif]-->
+ 
+
+			<div class="section-top-border">
+
+
+				<div class="progress-table-wrap">
+					<div class="progress-table">
+						<div class="table-head">
+							<div class="serial"># Çalışan</div>
+							<div class="serial">Firma No</div>
+							<div class="serial">Firma İsim</div>
+						</div>
+
+
+			{% for i in range(0, len) %} 
+
+					<div class="table-row" onClick="document.forms['mezun_ara{{i}}'].submit();" >
+					
+						<div class="serial">{{data[i][0]}}</div>
+						<div class="serial">{{data[i][1]}}</div>
+						<div class="serial">{{data[i][2]}}</div>
+						
+					</div>
+
+			{% endfor %}
+
+
+					</div>
+
+
+
+
+	<!-- anasayfa ilanlar-->
+
+    <!-- JS here -->
+    <script src="{{ url_for('static', filename="js/vendor/modernizr-3.5.0.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/vendor/jquery-1.12.4.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/popper.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/bootstrap.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/owl.carousel.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/isotope.pkgd.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/ajax-form.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/waypoints.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/jquery.counterup.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/imagesloaded.pkgd.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/scrollIt.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/jquery.scrollUp.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/wow.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/nice-select.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/jquery.slicknav.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/jquery.magnific-popup.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/plugins.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/gijgo.min.js")}}"></script>
+
+    <!--contact js-->
+    <script src="{{ url_for('static', filename="js/contact.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/jquery.ajaxchimp.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/jquery.form.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/jquery.validate.min.js")}}"></script>
+    <script src="{{ url_for('static', filename="js/mail-script.js")}}"></script>
+
+    <script src="{{ url_for('static', filename="js/main.js")}}"></script>
+    <script>
+    function myFunction(pencere) {
+					$('div[name = "'+pencere+'"]').toggle('ease');
+
+		}
+    </script>
+</body>
+
+</html>

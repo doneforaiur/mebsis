@@ -1,0 +1,484 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Edumark</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- <link rel="manifest" href="site.webmanifest"> -->
+	<link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
+	<!-- Place favicon.ico in the root directory -->
+
+	<!-- CSS here -->
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/bootstrap.min.css")}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/owl.carousel.min.css")}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/magnific-popup.css")}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/font-awesome.min.css")}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/themify-icons.css")}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/nice-select.css")}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/flaticon.css")}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/gijgo.css")}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/animate.css")}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/slicknav.css")}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/style.css")}}")}}">
+	<!-- <link rel="stylesheet" href="css/responsive.css"> -->
+</head>
+
+<body>
+	<!--[if lte IE 9]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+        <![endif]-->
+
+    <!-- header-start -->
+    <header>
+        <div class="header-area ">
+            <div id="sticky-header" class="main-header-area">
+                <div class="container-fluid p-0">
+                    <div class="row align-items-center">
+                        <div class="col-xl-2 col-lg-2">
+                            <div class="logo-img">
+                                <a href="index.html">
+                                    <img src="{{ url_for('static', filename="img/logo1.png")}}" alt=""> 
+										<div class="main-menu  d-none d-lg-block">
+											<font size=+2 color="white">KTÜ Mezunları</font> 
+										</div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-xl-7 col-lg-7">
+                            <div class="main-menu  d-none d-lg-block">
+                                <nav>
+                                    <ul id="navigation">
+                                        <li><a href="/index.html">Anasayfa</a></li>
+                                        <li><a class="active" href="/mezun_ara">Mezunlarımız</a></li>
+                                        <li><a><b> İlanlar </b><i class="ti-angle-down"></i></a>
+                                            <ul class="submenu">
+                                                {% if username != None%}
+                                                <li><a href="ilan?ilan_turu=standart">İş İlanları</a></li>
+                                                <li><a href="ilan?ilan_turu=staj">Staj İlanları</a></li>
+																								{% else %}
+                                                <li><a onClick='alert_uye_ol()' href="#">İş İlanları</a></li>
+                                                <li><a onClick='alert_uye_ol()' href="#">Staj İlanları</a></li>
+																								{% endif %}
+
+                                            </ul>
+                                        </li>
+										{% if username != None %}
+                                        <li><a href="/mesaj">Mesajlar</a></li>
+										{% endif %}                                        
+										<li><a href="about.html">Hakkımızda</a></li>
+                                        
+                                        <li><a href="contact.html">İletişim</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+
+						{% if username == None %}
+                       <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                            <div class="log_chat_area d-flex align-items-center">
+                                <a href="#test-form" class="login popup-with-form">
+                                    <i class="flaticon-user"></i>
+                                    <span>Giriş Yap</span>
+                                </a>
+                                <div class="live_chat_btn">
+                                    <a class="boxed_btn_orange">
+                                        <i class="fa fa-phone"></i>
+                                        <span>377 31 57</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+						{% else %}
+                        <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                            <div class="log_chat_area d-flex align-items-center">
+                                <a  href="/profil?ogrenci_no={{ogrenci_no}}" class="genric-btn primary circle">
+                                    <i class="flaticon-user"></i>
+                                    <span>{{username}}</span>
+                                </a>
+                                <div class="live_chat_btn">
+									<form id="mezun" name="cikis_yap" action="/cikis_yap" method="post">
+                                    <a  onClick="document.forms['cikis_yap'].submit();" class="genric-btn danger circle">
+                                        <span>Çıkış yap...</span>
+										<a type="input" name="username" valeu="{{username}}">
+                                    </a>
+									</form>
+                                </div>
+                            </div>
+                        </div>
+
+						{% endif %}
+                        <div class="col-12">
+                            <div class="mobile_menu d-block d-lg-none"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- header-end -->
+	
+		<!-- bradcam_area_start -->
+		<div class="bradcam_area breadcam_bg overlay2">
+				<h3>Mezunlarımız</h3>
+			</div>
+			<!-- bradcam_area_end -->
+
+
+	<!-- Start Align Area -->
+	<div class="whole-wrap">
+		<div class="container box_1170">
+			<div class="section-top-border">
+				
+				<h3 class="mb-30">Hatırlatma...</h3>
+				<div class="row">
+					<div class="col-lg-12">
+						<blockquote class="generic-blockquote">
+							Profiline bakmak istediğiniz mezunumuzun numarasına tıklayabilirsiniz.
+						</blockquote>
+					</div>
+				</div>
+
+			<div class="section-top-border">
+
+
+				<div class="progress-table-wrap">
+					<div class="progress-table">
+						<div class="table-head">
+							<div class="serial">Numara</div>
+							<div class="serial">İsim</div>
+							<div class="serial">Soyisim</div>
+							<div class="percentage">Çalıştığı Firma</div>
+						</div>
+
+			
+ 
+
+
+			{% for i in range(0, len) %} 
+
+				<form id="mezun" name="mezun_ara{{i}}" action="/profil?ogrenci_no={{data[i][0]}}" method="post">
+					<div class="table-row" onClick="document.forms['mezun_ara{{i}}'].submit();" >
+						<div class="serial">{{data[i][0]}}</div>
+						<div class="serial">{{data[i][1]}}</div>
+						<div class="serial">{{data[i][2]}}</div>
+						<div class="serial">{{data[i][3]}}</div>
+					</div>
+					<input type="hidden" name="ogrenci_no" value="{{data[i][0]}}"></input>
+					<input type="hidden" name="page_number" value="0"></input>
+				</form>
+
+			{% endfor %}
+
+
+					</div>
+ 
+
+				</div>
+
+<div class="section-top-border">
+<div class="button-group-area mt-80" style="text-align: center">
+
+<div>
+<form id="sayfa" name="sayfa" action="/mezun_ara" method="post">
+
+{% for i in range(low_limit, high_limit) %} 
+    {% if current_page == i %}
+		<input type="submit" name="page_number" id="pn{{i}}" value={{i+1}} onClick="document.forms['sayfa{{i}}'].submit();" class="genric-btn primary circle">
+    {% else %}
+		<input type="submit" name="page_number" id="pn{{i}}" value={{i+1}} onClick="document.forms['sayfa{{i}}'].submit();" class="genric-btn success circle">
+	{% endif%}		
+	<input type="hidden" id="ogrenci_no" name="ogrenci_no" value=0></input>
+{% endfor %}
+</div>
+
+
+</div>
+</div>
+			</div>
+
+
+
+			<div class="section-top-border">
+				<div class="row">
+					<div class="col-lg-8 col-md-8">
+						<h3 class="mb-10">Mezun Ara...</h3>
+						<form name="mezun_ara" id="mezun_ara" action="/mezun_ara" method="post">
+							<div class="mt-10">
+								<input type="text" name="isim" placeholder="İsim"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'İsim'" 
+									class="single-input">
+							</div>
+							<div class="mt-10">
+								<input type="text" name="soyad" placeholder="Soyisim"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'Soyisim'" 
+									class="single-input">
+							</div>
+							<div class="mt-10">
+								<input type="email" name="eposta" placeholder="E-posta adresi"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'E-posta adresi'" 
+									class="single-input">
+							</div>
+							<div class="mt-10">
+								<input type="ogrenci_no" name="ogrenci_no" placeholder="Öğrenci numarası"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'Öğrenci numarası'"
+									class="single-input">
+							</div>
+							<div class="input-group-icon mt-10">
+								<div class="icon"><i class="fa fa-thumb-tack" aria-hidden="true"></i></div>
+								<div class="form-select" id="default-select"">
+											<select>
+												<option value=" 1">Fakülte</option>
+									<option value="1">Mühendislik Fakültesi</option>
+									<option value="1">Eczacilik Fakültesi̇</option>
+									<option value="1">Fen Fakültesi</option>
+									<option value="1">Edebiyat Fakültesi</option>
+									</select>
+								</div>
+							</div>
+
+							<!-- For Gradient Border Use -->
+							<!-- <div class="mt-10">
+										<div class="primary-input">
+											<input id="primary-input" type="text" name="first_name" placeholder="Primary color" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Primary color'">
+											<label for="primary-input"></label>
+										</div>
+									</div> -->
+						<div class="container">
+							<button class="genric-btn primary circle" type="submit" form="mezun_ara" value="Submit">  Ara  </button>
+						</div>
+						</form>
+					</div>
+					<div class="col-lg-3 col-md-4 mt-sm-30">
+						<div class="single-element-widget">
+							<h3 class="mb-30">Switches</h3>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>01. Sample Switch</p>
+								<div class="primary-switch">
+									<input type="checkbox" id="default-switch">
+									<label for="default-switch"></label>
+								</div>
+							</div>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>02. Primary Color Switch</p>
+								<div class="primary-switch">
+									<input type="checkbox" id="primary-switch" checked>
+									<label for="primary-switch"></label>
+								</div>
+							</div>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>03. Confirm Color Switch</p>
+								<div class="confirm-switch">
+									<input type="checkbox" id="confirm-switch" checked>
+									<label for="confirm-switch"></label>
+								</div>
+							</div>
+						</div>
+						<div class="single-element-widget mt-30">
+							<h3 class="mb-30">Selectboxes</h3>
+							<div class="default-select" id="default-select"">
+										<select>
+											<option value=" 1">English</option>
+								<option value="1">Spanish</option>
+								<option value="1">Arabic</option>
+								<option value="1">Portuguise</option>
+								<option value="1">Bengali</option>
+								</select>
+							</div>
+						</div>
+						<div class="single-element-widget mt-30">
+							<h3 class="mb-30">Checkboxes</h3>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>01. Sample Checkbox</p>
+								<div class="primary-checkbox">
+									<input type="checkbox" id="default-checkbox">
+									<label for="default-checkbox"></label>
+								</div>
+							</div>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>02. Primary Color Checkbox</p>
+								<div class="primary-checkbox">
+									<input type="checkbox" id="primary-checkbox" checked>
+									<label for="primary-checkbox"></label>
+								</div>
+							</div>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>03. Confirm Color Checkbox</p>
+								<div class="confirm-checkbox">
+									<input type="checkbox" id="confirm-checkbox">
+									<label for="confirm-checkbox"></label>
+								</div>
+							</div>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>04. Disabled Checkbox</p>
+								<div class="disabled-checkbox">
+									<input type="checkbox" id="disabled-checkbox" disabled>
+									<label for="disabled-checkbox"></label>
+								</div>
+							</div>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>05. Disabled Checkbox active</p>
+								<div class="disabled-checkbox">
+									<input type="checkbox" id="disabled-checkbox-active" checked disabled>
+									<label for="disabled-checkbox-active"></label>
+								</div>
+							</div>
+						</div>
+						<div class="single-element-widget mt-30">
+							<h3 class="mb-30">Radios</h3>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>01. Sample radio</p>
+								<div class="primary-radio">
+									<input type="checkbox" id="default-radio">
+									<label for="default-radio"></label>
+								</div>
+							</div>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>02. Primary Color radio</p>
+								<div class="primary-radio">
+									<input type="checkbox" id="primary-radio" checked>
+									<label for="primary-radio"></label>
+								</div>
+							</div>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>03. Confirm Color radio</p>
+								<div class="confirm-radio">
+									<input type="checkbox" id="confirm-radio" checked>
+									<label for="confirm-radio"></label>
+								</div>
+							</div>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>04. Disabled radio</p>
+								<div class="disabled-radio">
+									<input type="checkbox" id="disabled-radio" disabled>
+									<label for="disabled-radio"></label>
+								</div>
+							</div>
+							<div class="switch-wrap d-flex justify-content-between">
+								<p>05. Disabled radio active</p>
+								<div class="disabled-radio">
+									<input type="checkbox" id="disabled-radio-active" checked disabled>
+									<label for="disabled-radio-active"></label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Align Area -->
+	
+		<!-- form itself end-->
+    <form action="/login" method="post" id="test-form" class="white-popup-block mfp-hide">
+        <div class="popup_box ">
+            <div class="popup_inner">
+                <div class="logo text-center">
+                    <a href="#">
+                        <img src="{{ url_for('static', filename="img/form-logo.png")}}" alt="">
+                    </a>
+                </div>
+                <h3>Sign in</h3>
+                    <div class="row">
+                        <div class="col-xl-12 col-md-12">
+                            <input type="text" name="username" placeholder="Enter email">
+                        </div>
+                        <div class="col-xl-12 col-md-12">
+                            <input type="password" name="password" placeholder="Password">
+                        </div>
+                        <div class="col-xl-12">
+                            <button type="submit" class="boxed_btn_orange">Sign in</button>
+                        </div>
+                    </div>
+                <p class="doen_have_acc">Don’t have an account? <a class="dont-hav-acc" href="#test-form2">Sign Up</a>
+                </p>
+            </div>
+        </div>
+    </form>
+		<!-- form itself end -->
+	
+		<!-- form itself end-->
+		<form id="test-form2" class="white-popup-block mfp-hide">
+			<div class="popup_box ">
+				<div class="popup_inner">
+					<div class="logo text-center">
+						<a href="#">
+							<img src="{{ url_for('static', filename="img/form-logo.png")}}" alt="">
+						</a>
+					</div>
+					<h3>Resistration</h3>
+					<form action="#">
+						<div class="row">
+							<div class="col-xl-12 col-md-12">
+								<input type="email" placeholder="Enter email">
+							</div>
+							<div class="col-xl-12 col-md-12">
+								<input type="password" placeholder="Password">
+							</div>
+							<div class="col-xl-12 col-md-12">
+								<input type="Password" placeholder="Confirm password">
+							</div>
+							<div class="col-xl-12">
+								<button type="submit" class="boxed_btn_orange">Sign Up</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</form>
+		<!-- form itself end -->
+
+	<!-- JS here -->
+	<script src="{{ url_for('static', filename="js/vendor/modernizr-3.5.0.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/vendor/jquery-1.12.4.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/popper.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/bootstrap.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/owl.carousel.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/isotope.pkgd.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/ajax-form.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/waypoints.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/jquery.counterup.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/imagesloaded.pkgd.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/scrollIt.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/jquery.scrollUp.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/wow.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/nice-select.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/jquery.slicknav.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/jquery.magnific-popup.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/plugins.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/gijgo.min.js")}}"></script>
+
+	<!--contact js-->
+	<script src="{{ url_for('static', filename="js/contact.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/jquery.ajaxchimp.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/jquery.form.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/jquery.validate.min.js")}}"></script>
+	<script src="{{ url_for('static', filename="js/mail-script.js")}}"></script>
+
+	<script src="{{ url_for('static', filename="js/main.js")}}"></script>
+    <script>
+        $('#datepicker').datepicker({
+            iconsLibrary: 'fontawesome',
+            disableDaysOfWeek: [0, 0],
+        //     icons: {
+        //      rightIcon: '<span class="fa fa-caret-down"></span>'
+        //  }
+        });
+        $('#datepicker2').datepicker({
+            iconsLibrary: 'fontawesome',
+            icons: {
+             rightIcon: '<span class="fa fa-caret-down"></span>'
+         }
+
+        });
+        var timepicker = $('#timepicker').timepicker({
+         format: 'HH.MM'
+     });
+     	function alert_uye_ol(){
+		alert("İlanları görüntüleyebilmek için oturum açınız.");
+	}
+    </script>
+</body>
+</html>

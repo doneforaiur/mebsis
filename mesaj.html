@@ -114,17 +114,14 @@ body {
 </body>
 {% if message_to == None %}
 	<h1>Mesaj kutusu</h1>
+	<a href="/anasayfa" class="previous round"><b>&#8249;</b></a>
 {% else %}
 	<h1>{{message_to}} ile mesajlarınız...</h1>
+	<a href="/mesaj" class="previous round"><b>&#8249;</b></a>
 {% endif %}
 
-<div name="chat" class="chat" onClick="scrollToBottom('chat')">
 
-{% if message_to != None %}	
-<a href="/mesaj" class="previous round"><b>&#8249;</b></a>
-{% else %}
-<a href="/anasayfa" class="previous round"><b>&#8249;</b></a>
-{% endif %}
+<div name="chat" id="chat" class="chat">
 
 
 {% for i in range(0, len) %}
@@ -149,7 +146,7 @@ body {
 
 {% if message_to != None %}
 	<form name="konusma_cevap" action="/mesaj?message_to={{message_to}}" method="post" style="display: flex; justify-content: flex-end">
-		<input name="cevap" type="text" size="32"/>
+		<input autocomplete="off" name="cevap" type="text" size="32"/>
 		<input type="submit" value="Gönder" />
 	</form>
 {% endif %}
@@ -184,14 +181,17 @@ body {
 </html>
 
 <script type="text/javascript">
+
+
+window.onload=function () {
+     var objDiv = document.getElementById("chat");
+     objDiv.scrollTop = objDiv.scrollHeight;
+}
+
 if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
 
-function scrollToBottom (id) {
-   var div = document.getElementById(id);
-   div.scrollTop = div.scrollHeight - div.clientHeight;
-}
 
 </script>
 

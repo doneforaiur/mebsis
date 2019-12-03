@@ -53,14 +53,21 @@
                                 <nav>
                                     <ul id="navigation">
                                         <li><a href="anasayfa">Anasayfa</a></li>
-                                        <li><a href="/mezun_ara">Mezunlarımız</a></li>
+                                        <li><a class="active" href="/mezun_ara">Mezunlarımız</a></li>
                                         <li><a href="#"><b> İlanlar </b><i class="ti-angle-down"></i></a>
                                             <ul class="submenu">
+                                                {% if username != None%}
                                                 <li><a href="ilan?ilan_turu=standart">İş İlanları</a></li>
                                                 <li><a href="ilan?ilan_turu=staj">Staj İlanları</a></li>
+																								{% else %}
+                                                <li><a onClick='alert_uye_ol()' href="#">İş İlanları</a></li>
+                                                <li><a onClick='alert_uye_ol()' href="#">Staj İlanları</a></li>
+																								{% endif %}
                                             </ul>
                                         </li>
+                                        {% if username != None%}
                                         <li><a href="/mesaj">Mesajlar</a></li>
+                                        {% endif %}
                                         <li><a href="about.html">Hakkımızda</a></li>
                                         
                                         <li><a href="contact.html">İletişim</a></li>
@@ -68,6 +75,22 @@
                                 </nav>
                             </div>
                         </div>
+                        						{% if username == None %}
+                       <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                            <div class="log_chat_area d-flex align-items-center">
+                                <a href="#test-form" class="login popup-with-form">
+                                    <i class="flaticon-user"></i>
+                                    <span>Giriş Yap</span>
+                                </a>
+                                <div class="live_chat_btn">
+                                    <a class="boxed_btn_orange">
+                                        <i class="fa fa-phone"></i>
+                                        <span>377 31 57</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+						{% else %}
                         <div class="col-xl-3 col-lg-3 d-none d-lg-block">
                             <div class="log_chat_area d-flex align-items-center">
                                 <a  href="/profil?ogrenci_no={{userno}}" class="genric-btn primary circle">
@@ -84,6 +107,8 @@
                                 </div>
                             </div>
                         </div>
+
+						{% endif %}
                         <div class="col-12">
                             <div class="mobile_menu d-block d-lg-none"></div>
                         </div>
@@ -234,7 +259,7 @@
                         <a style="display:inline-block; text-align:center; width:100%; height:100%;" href="/takipciler?ogrenci_no={{ogrenci_no}}" class="genric-btn success circle arrow">Takipçiler</a>
 												<a style="display:inline-block; text-align:center; width:100%; height:100%;" href="/takipedilenler?ogrenci_no={{ogrenci_no}}" class="genric-btn success circle arrow">Takip Edilenler</a>
                         
-
+									{% if username != None %}
                         {% if userno != ogrenci_no %}
                         	{% if ogrenci_no in takip_edilenler %}
 															<a style="display:inline-block; text-align:center; width:100%; height:100%;" href="/takipten_cikar?ogrenci_no={{ogrenci_no}}" class="genric-btn danger circle arrow">Takipten Çıkar</a>                    			
@@ -242,12 +267,17 @@
 														<a style="display:inline-block; text-align:center; width:100%; height:100%;" href="/takip_et?ogrenci_no={{ogrenci_no}}" class="genric-btn info circle arrow">Takip Et</a>
                     			{% endif %}
                         {% endif %}
+                  {% endif %}
                         </div>
 												{% if userno != ogrenci_no %}
                         <div class="feedback_info">
                         <form action="mesaj?message_to={{ ogrenci_no }}" method="post">
                                 <textarea name="cevap" id="cevap" cols="30" rows="5" placeholder="Mesajınız..."></textarea>
+                                {% if username != None%}
                                 <button type="submit" class="boxed_btn">Mesaj Gönder</button>
+                            		{% else %}
+                                <a href="#" onClick='alert_uye_ol()' class="boxed_btn">Mesaj Gönder</a>
+                            		{% endif %}
                             </form>
                         </div>
                         {% endif %}
@@ -479,5 +509,9 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 
     <script src="{{ url_for('static', filename="js/main.js")}}"></script>
 </body>
-
+<script type="text/javascript">
+	function alert_uye_ol(){
+		alert("İlanları görüntüleyebilmek için oturum açınız.");
+	}
+</script>
 </html>
