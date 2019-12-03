@@ -19,6 +19,26 @@ def get_name(ogrenci_no):
 	return username
 
 
+
+
+
+@app.route('/admin')
+def admin():
+	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
+	cursor = db.cursor()
+	
+	cursor.execute("SELECT ticari_sicil, unvan from firma")
+	data = cursor.fetchall()
+	cursor.execute("SELECT count(*) from mezun where firma_no_fk IN(SELECT ticari_sicil from firma) GROUP BY firma_no_fk")
+	count = cursor.fetchall()
+	cursor.execute("SELECT count(*), ticari_sicil, unvan FROM firma RIGHT JOIN mezun on mezun.firma_no_fk=firma.ticari_sicil GROUP BY ticari_sicil ORDER BY count(*) DESC")
+	data = cursor.fetchall()
+	print(data)
+	return render_template('admin.html', data=data, len=len(data))
+
+	cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
+
+
 @app.route('/index.html',methods=['GET'])
 @app.route('/',methods=['GET'])
 def index():
@@ -220,6 +240,7 @@ def profil():
 	
 	if(request.cookies.get('username') == None):
 		username = None
+		userno = None
 	else:
 		userno = request.cookies.get('username')
 		username = get_name(userno)
