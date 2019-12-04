@@ -16,9 +16,41 @@ def get_name(ogrenci_no):
 	cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(ogrenci_no)+";")
 	username = cursor.fetchone()
 	username = username[0].capitalize().decode('utf8')
+	db.close()
 	return username
 
 
+
+@app.route('/anket_atama', methods=['GET'])
+def anket_atama():	
+	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
+	cursor = db.cursor()
+
+	if(request.args.get('low_year') != None and request.args.get('high_year') != None ):
+		low_year = str( request.args.get('low_year') )
+		high_year = str( request.args.get('high_year') )
+		cursor.execute("select ogrenci_no from mezun where bitirme_tarihi BETWEEN '"+low_year+"' and '"+high_year+"';")
+		result = cursor.fetchall()
+
+		result = list(map(list, result))
+		data = []
+		for i in range(0,len(result)):
+			data.append(result[i][0],) # İkisini birleştir.
+		for i in data:
+			cursor.execute("insert IGNORE into anket values (" + i +");")
+		
+		db.commit()
+
+		
+		if(request.cookies.get('username') == None):
+			username = None
+		else:
+			username = request.cookies.get('username')
+			cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(username)+";")
+			username = cursor.fetchone()
+			username = username[0].capitalize().decode('utf8')
+		db.close()
+	return redirect(url_for('admin'))
 
 
 
@@ -33,9 +65,10 @@ def admin():
 	count = cursor.fetchall()
 	cursor.execute("SELECT count(*), ticari_sicil, unvan FROM firma RIGHT JOIN mezun on mezun.firma_no_fk=firma.ticari_sicil GROUP BY ticari_sicil ORDER BY count(*) DESC")
 	data = cursor.fetchall()
-	print(data)
-	return render_template('admin.html', data=data, len=len(data))
+	data = list(map(list, data))	
 
+	return render_template('admin.html', data=data, len=len(data))
+	db.close()
 	cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
 
 
@@ -52,6 +85,7 @@ def index():
 	ilan_sayisi = cursor.fetchone()
 	if(request.cookies.get('username') != None):
 		return redirect(url_for('anasayfa'))
+	db.close()
 	return render_template('index.html', ilan_sayisi=ilan_sayisi[0],mezun=mezun_sayisi[0], firma=firma_sayisi[0], username=None)
 
 
@@ -66,7 +100,7 @@ def contact():
 		cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(username)+";")
 		username = cursor.fetchone()
 		username = username[0].capitalize().decode('utf8')
-
+		db.close()	
 	return render_template('contact.html', username=username)
 
 
@@ -84,8 +118,12 @@ def mezunlar():
 			ogrenci_no1 = 0
 		page_number=0
 
+
+
 	db = MySQLdb.connect("localhost","misafir","misafir","mebsis" ,charset='utf8', init_command='SET NAMES UTF8')
 	cursor = db.cursor()
+
+
 	if(ogrenci_no1 == None):
 		ogrenci_no1 = 0
 	if(int(ogrenci_no1) == 0):
@@ -115,6 +153,7 @@ def mezunlar():
 		cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(username)+";")
 		username = cursor.fetchone()
 		username = username[0].capitalize().decode('utf8')
+	db.close()
 	return render_template('elements.html', username=username, ogrenci_no=request.cookies.get('username'),data=rows, len=len(rows), page_number=page_number,current_page=current_page,
 											low_limit=low_limit, high_limit=high_limit)
 
@@ -131,6 +170,8 @@ def login():
 		response = redirect(url_for('anasayfa'))
 		response.set_cookie('username', username)
 		response.set_cookie('password', str(result[0]))
+
+	db.close()
 	return response
 
 
@@ -153,7 +194,14 @@ def anasayfa():
 	if(username != None):
 		userno = request.cookies.get('username')
 		username = get_name(userno)
-	
+			
+		cursor.execute("SELECT * from anket;")
+		anket = cursor.fetchall()
+		anket_flag = False
+		if userno in str(zip(*anket)):
+			anket_flag = True
+
+		
 	cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
 	ilanlar = cursor.fetchall()
 	ilanlar = list(map(list, ilanlar))
@@ -164,7 +212,8 @@ def anasayfa():
 	
 	cursor.execute("select yorum_text, ilan_id_fk, yorum_tarihi,ogrenci_id_fk from yorum where ilan_id_fk IN (" + ','.join(map(str, yorumlar)) +")")
 	yorumlar = cursor.fetchall()
-	return render_template('anasayfa.html',yorumlar=yorumlar, yorum_len=len(yorumlar), aktif=False,ilanlar=ilanlar, len=len(ilanlar), username=username,ogrenci_no=userno)
+	db.close()
+	return render_template('anasayfa.html',anket_flag=anket_flag,yorumlar=yorumlar, yorum_len=len(yorumlar), aktif=False,ilanlar=ilanlar, len=len(ilanlar), username=username,ogrenci_no=userno)
 
 
 @app.route('/ilan')
@@ -187,7 +236,7 @@ def ilan():
 		cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun WHERE ogrenci_no IN (select ilani_acan_fk from ilan where ilan_id='"+ilan_no+"');")
 		ilanlar = cursor.fetchall()
 		ilanlar = list(map(list, ilanlar))
-		return render_template('anasayfa.html',aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+		return render_template('anasayfa.html',anket_flag=False, aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
 	
 	if(ilan_turu == None):
 		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk;")
@@ -205,7 +254,8 @@ def ilan():
 	
 	cursor.execute("select yorum_text, ilan_id_fk, yorum_tarihi,ogrenci_id_fk from yorum where ilan_id_fk IN (" + ','.join(map(str, yorumlar)) +")")
 	yorumlar = cursor.fetchall()
-	return render_template('anasayfa.html',yorumlar=yorumlar, yorum_len=len(yorumlar), aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+	db.close()
+	return render_template('anasayfa.html',anket_flag=False,yorumlar=yorumlar, yorum_len=len(yorumlar), aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
 
 
 
@@ -219,7 +269,7 @@ def yorum_yaz():
 		cursor = db.cursor()
 		cursor.execute("insert into yorum(ilan_id_fk, ogrenci_id_fk, yorum_text) VALUES('"+ilan_no+"','"+userno+"','"+yorum+"')")
 		db.commit()
-		
+		db.close()
 		return redirect(url_for('anasayfa'))
 
 
@@ -247,6 +297,7 @@ def profil():
 		
 	cursor.execute("SELECT ogrenci_no from mezun where ogrenci_no IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
 	takip_edilenler = cursor.fetchall()
+	db.close()
 	return render_template('profil.html',takip_edilenler=str(takip_edilenler), username=username, userno=userno,ogrenci_no=ogrenci_no, isim=isim.capitalize().encode('utf-8'), soyad=soyad.encode('utf-8'), firma=firma)
 
 @app.route('/takipciler', methods=['GET'])
@@ -261,6 +312,7 @@ def takipciler():
 	else:
 		userno = request.cookies.get('username')
 		username = get_name(userno)
+	db.close()
 	return render_template('elements.html', username=username,ogrenci_no=userno,data=result, len=len(result), low_limit=0, high_limit=0)
 
 
@@ -276,6 +328,7 @@ def takipedilenler():
 	else:
 		userno = request.cookies.get('username')
 		username = get_name(userno)
+	db.close()
 	return render_template('elements.html',username=username,ogrenci_no=userno, data=result, len=len(result), low_limit=0, high_limit=0)
 
 @app.route('/takip_et', methods = ['GET'])
@@ -286,6 +339,7 @@ def takip_et():
 	userno = request.cookies.get('username')
 	cursor.execute("INSERT INTO takip(follower_id, following_id) VALUES('"+str(userno)+"','"+str(ogrenci_no)+"')")
 	db.commit()
+	db.close()
 	return redirect(url_for('profil', ogrenci_no=ogrenci_no))
 	
 @app.route('/takipten_cikar', methods = ['GET'])
@@ -296,6 +350,7 @@ def takipten_cikar():
 	userno = request.cookies.get('username')
 	cursor.execute("delete from takip where follower_id='"+str(userno)+"' and following_id='"+str(ogrenci_no)+"'")
 	db.commit()
+	db.close()
 	return redirect(url_for('profil', ogrenci_no=ogrenci_no))
 	
 
@@ -319,12 +374,14 @@ def mesaj():
 					mesaj_data_list[i][2] = username
 				cursor.execute("SELECT isim, soyad from mezun where ogrenci_no='"+mesaj_data_list[i][1]+"';")
 				message_to_name.append(cursor.fetchone())
+				db.close()
 			return render_template('mesaj.html', data=mesaj_data_list, len=len(mesaj_data),message_to_name=message_to_name, username=username, message_to=message_to)
 		
 		db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
 		cursor = db.cursor()
 		cursor.execute("SELECT mesaji_atan, mesaj, mesaj_tarihi from mesaj where konusma_id_fk IN (SELECT konusma_id FROM konusma where (kullanici_bir='"+str(username)+"' OR kullanici_bir='"+str(message_to)+"') AND (kullanici_iki='"+str(message_to)+"' OR kullanici_iki='"+str(username)+"'));")
 		mesaj_data = cursor.fetchall() # Temizlenmesi gerek.
+		db.close()
 		return render_template('mesaj.html', data=mesaj_data, len=len(mesaj_data), username=username, message_to=message_to)
 
 	if request.method == "POST":
@@ -343,7 +400,8 @@ def mesaj():
 		cursor.execute("INSERT INTO mesaj(konusma_id_fk, mesaji_atan, mesaj) VALUES ('"+str(konusma_id_fk[0])+"','"+str(username)+"','"+str(message)+"');")	
 		db.commit()
 		cursor.execute("SELECT mesaji_atan, mesaj, mesaj_tarihi from mesaj where konusma_id_fk IN (SELECT konusma_id FROM konusma where (kullanici_bir='"+str(username)+"' OR kullanici_bir='"+str(message_to)+"') AND (kullanici_iki='"+str(message_to)+"' OR kullanici_iki='"+str(username)+"'));")
-		mesaj_data = cursor.fetchall() 
+		mesaj_data = cursor.fetchall()
+		db.close()
 		return render_template('mesaj.html', data=mesaj_data, len=len(mesaj_data), username=username, message_to=message_to)
 		
 
