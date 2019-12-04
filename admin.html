@@ -28,6 +28,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename="css/style.css")}}">
     <!-- <link rel="stylesheet" href="css/responsive.css"> -->
     <style>
+			.ui-datepicker-calendar {
+				 display: none;
+			}
+			.ui-datepicker-month {
+				 display: none;
+			}
+			.ui-datepicker-next,.ui-datepicker-prev {
+				display:none;
+			}
 			.alignleft {
 				float: left;
 			}
@@ -69,11 +78,17 @@
 
 
 					</div>
-
-
-
-
-	<!-- anasayfa ilanlar-->
+					</div>
+					
+<div class="section-top-border">
+<br><br>
+<form action="/anket_atama">
+Mezuniyet yılı şu yıllar arasında olan mezunları listele;
+  <input type="text" name="low_year" value="1990">
+  <input type="text" name="high_year" value="2000">
+  <input type="submit">
+</form>
+</div>
 
     <!-- JS here -->
     <script src="{{ url_for('static', filename="js/vendor/modernizr-3.5.0.min.js")}}"></script>
@@ -108,6 +123,7 @@
 					$('div[name = "'+pencere+'"]').toggle('ease');
 
 		}
+
     </script>
 </body>
 

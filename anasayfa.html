@@ -37,11 +37,11 @@
     </style>
 </head>
 
-<body>
+<body onload="anket_var()">
     <!--[if lte IE 9]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
     <![endif]-->
-
+   
     <!-- header-start -->
     <header>
         <div class="header-area ">
@@ -242,12 +242,18 @@
     <script src="{{ url_for('static', filename="js/mail-script.js")}}"></script>
 
     <script src="{{ url_for('static', filename="js/main.js")}}"></script>
-    <script>
+
+</body>
+    <script type="text/javascript">
     function myFunction(ilan_id) {
 					$('div[name = "'+ilan_id+'"]').toggle('ease');
 
+		}	
+		function anket_var(){
+		
+{% if anket_flag == True %}
+			alert("Doldurmanızı istediğimiz bir anketiniz var. Link; ...");
+{%endif %}
 		}
     </script>
-</body>
-
 </html>
