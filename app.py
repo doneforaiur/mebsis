@@ -38,10 +38,7 @@ def anket_atama():
 			data.append(result[i][0],) # İkisini birleştir.
 		for i in data:
 			cursor.execute("insert IGNORE into anket values (" + i +");")
-		
 		db.commit()
-
-		
 		if(request.cookies.get('username') == None):
 			username = None
 		else:
@@ -66,10 +63,17 @@ def admin():
 	cursor.execute("SELECT count(*), ticari_sicil, unvan FROM firma RIGHT JOIN mezun on mezun.firma_no_fk=firma.ticari_sicil GROUP BY ticari_sicil ORDER BY count(*) DESC")
 	data = cursor.fetchall()
 	data = list(map(list, data))	
+	cursor.execute("SELECT ogrenci_no_fk from anket")
+	anket_data = cursor.fetchall()
+	rows = []
+	for row in anket_data:
+		rows.append(row)
+	cursor.execute("SELECT AVG(YEAR(ise_baslama_tarihi) - bitirme_tarihi) from mezun where ise_baslama_tarihi IS NOT NULL")
+	ortalama = cursor.fetchall()
+	db.close()	
+	return render_template('admin.html', ortalama=int(ortalama[0][0]), anket_len=len(rows),anket_data=rows,data=data, len=len(data))
 
-	return render_template('admin.html', data=data, len=len(data))
-	db.close()
-	cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
+	#cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
 
 
 @app.route('/index.html',methods=['GET'])
@@ -229,8 +233,9 @@ def ilan():
 	else:
 		ilan_turu = None
 		
-	cursor = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' ).cursor()
-
+	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
+	cursor = db.cursor()
+	
 	if(request.args.get('ilan_no') != None):
 		ilan_no = str(request.args.get('ilan_no'))
 		cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun WHERE ogrenci_no IN (select ilani_acan_fk from ilan where ilan_id='"+ilan_no+"');")
@@ -374,7 +379,8 @@ def mesaj():
 					mesaj_data_list[i][2] = username
 				cursor.execute("SELECT isim, soyad from mezun where ogrenci_no='"+mesaj_data_list[i][1]+"';")
 				message_to_name.append(cursor.fetchone())
-				db.close()
+
+			db.close()
 			return render_template('mesaj.html', data=mesaj_data_list, len=len(mesaj_data),message_to_name=message_to_name, username=username, message_to=message_to)
 		
 		db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
