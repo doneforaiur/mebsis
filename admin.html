@@ -90,6 +90,25 @@ Mezuniyet yılı şu yıllar arasında olan mezunları listele;
 </form>
 </div>
 
+<div class="section-top-border">
+Anket atanan mezunar;
+			{% for i in range(0, anket_len) %} 
+					
+						<div class="serial">{{ anket_data[i][0] }}</div>
+						
+			{% endfor %}
+
+</div>
+
+
+<div class="section-top-border">
+
+Ortalama işe girme süresi; {{ ortalama }}
+
+</div>
+
+
+
     <!-- JS here -->
     <script src="{{ url_for('static', filename="js/vendor/modernizr-3.5.0.min.js")}}"></script>
     <script src="{{ url_for('static', filename="js/vendor/jquery-1.12.4.min.js")}}"></script>

@@ -211,7 +211,45 @@
     
 {% endfor %}
 
+{% if ilan_flag == True %}
 
+						<form name="ilan_ara" id="ilan_ara" action="/ilan" method="get">
+							<div class="mt-10">
+								<input type="text" name="isim" placeholder="İsim"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'İsim'" 
+									class="single-input">
+							</div>
+							<div class="mt-10">
+								<input type="text" name="soyad" placeholder="Soyisim"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'Soyisim'" 
+									class="single-input">
+							</div>
+							<div class="mt-10">
+								<input type="text" name="ogrenci_no" placeholder="Öğrenci numarası..."
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'Öğrenci numarası'"
+									class="single-input">
+							</div>
+							<div class="mt-10">
+							<input type="text" name="sehir" placeholder="Şehir..."
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'Öğrenci numarası'"
+									class="single-input">
+							</div>
+							<div class="input-group-icon mt-10">
+								<div class="icon"><i class="fa fa-thumb-tack" aria-hidden="true"></i></div>
+								<div class="form-select" id="default-select"">
+											<select>
+									<option value=" 1">Fakülte</option>
+									<option value="1">Mühendislik Fakültesi</option>
+									<option value="1">Eczacilik Fakültesi̇</option>
+									<option value="1">Fen Fakültesi</option>
+									<option value="1">Edebiyat Fakültesi</option>
+									</select>
+								</div>
+							</div>
+							<button onClick="document.forms['ilan_ara'].submit();" class="genric-btn primary circle">İlan Ara</button>
+						</form>
+
+{% endif %}
 	<!-- anasayfa ilanlar-->
 
     <!-- JS here -->

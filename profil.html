@@ -258,11 +258,10 @@
                             </ul><br>
                         <a style="display:inline-block; text-align:center; width:100%; height:100%;" href="/takipciler?ogrenci_no={{ogrenci_no}}" class="genric-btn success circle arrow">Takipçiler</a>
 												<a style="display:inline-block; text-align:center; width:100%; height:100%;" href="/takipedilenler?ogrenci_no={{ogrenci_no}}" class="genric-btn success circle arrow">Takip Edilenler</a>
-                        
 									{% if username != None %}
                         {% if userno != ogrenci_no %}
                         	{% if ogrenci_no in takip_edilenler %}
-															<a style="display:inline-block; text-align:center; width:100%; height:100%;" href="/takipten_cikar?ogrenci_no={{ogrenci_no}}" class="genric-btn danger circle arrow">Takipten Çıkar</a>                    			
+														<a style="display:inline-block; text-align:center; width:100%; height:100%;" href="/takipten_cikar?ogrenci_no={{ogrenci_no}}" class="genric-btn danger circle arrow">Takipten Çıkar</a>                    			
 													{% else %}
 														<a style="display:inline-block; text-align:center; width:100%; height:100%;" href="/takip_et?ogrenci_no={{ogrenci_no}}" class="genric-btn info circle arrow">Takip Et</a>
                     			{% endif %}
@@ -280,6 +279,19 @@
                             		{% endif %}
                             </form>
                         </div>
+                        {% else %}
+												<a style="display:inline-block; text-align:center; width:100%; height:100%;" href="/cv_indir" class="genric-btn info circle arrow">CV'mi İndir</a>
+                        <div class="feedback_info">
+                        <form action="/ilan_ekle" method="post">
+														<input type="text" name="ilan_tipi" id="ilan_tipi" placeholder="İlan Tipi -- 'staj' veya 'standart' olmas'" onfocus="this.placeholder = ''" onblur="this.placeholder = 'İlan Tipi'" class="single-input">
+														<input type="text" name="firma_no" id="firma_no" placeholder="Firma'nın Sicil Numarası" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Firma'nın Sicil Numarası'" class="single-input">
+                            <textarea name="ilan_text" id="ilan_text" cols="30" rows="5" placeholder="İlan açıklamanız..."></textarea>	
+
+                            <button type="submit" class="boxed_btn">İlanı Ekle</button>
+                            </form>
+                        </div>
+                        
+                        
                         {% endif %}
                     </div>
                 </div>

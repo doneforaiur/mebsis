@@ -194,6 +194,7 @@
 {% endfor %}
 </div>
 
+</form>
 
 </div>
 </div>
@@ -201,11 +202,7 @@
 
 
 
-			<div class="section-top-border">
-				<div class="row">
-					<div class="col-lg-8 col-md-8">
-						<h3 class="mb-10">Mezun Ara...</h3>
-						<form name="mezun_ara" id="mezun_ara" action="/mezun_ara" method="post">
+						<form name="mezun_ara" id="mezun_ara" action="/mezun_ara" method="GET">
 							<div class="mt-10">
 								<input type="text" name="isim" placeholder="İsim"
 									onfocus="this.placeholder = ''" onblur="this.placeholder = 'İsim'" 
@@ -217,12 +214,12 @@
 									class="single-input">
 							</div>
 							<div class="mt-10">
-								<input type="email" name="eposta" placeholder="E-posta adresi"
+								<input type="text" name="eposta" placeholder="E-posta adresi"
 									onfocus="this.placeholder = ''" onblur="this.placeholder = 'E-posta adresi'" 
 									class="single-input">
 							</div>
 							<div class="mt-10">
-								<input type="ogrenci_no" name="ogrenci_no" placeholder="Öğrenci numarası"
+								<input type="text" name="ogrenci_no" placeholder="Öğrenci numarası"
 									onfocus="this.placeholder = ''" onblur="this.placeholder = 'Öğrenci numarası'"
 									class="single-input">
 							</div>
@@ -237,138 +234,8 @@
 									<option value="1">Edebiyat Fakültesi</option>
 									</select>
 								</div>
-							</div>
-
-							<!-- For Gradient Border Use -->
-							<!-- <div class="mt-10">
-										<div class="primary-input">
-											<input id="primary-input" type="text" name="first_name" placeholder="Primary color" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Primary color'">
-											<label for="primary-input"></label>
-										</div>
-									</div> -->
-						<div class="container">
-							<button class="genric-btn primary circle" type="submit" form="mezun_ara" value="Submit">  Ara  </button>
-						</div>
+							<button onClick="document.forms['mezun_ara'].submit();" class="genric-btn primary circle">Mezun Ara</button>
 						</form>
-					</div>
-					<div class="col-lg-3 col-md-4 mt-sm-30">
-						<div class="single-element-widget">
-							<h3 class="mb-30">Switches</h3>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>01. Sample Switch</p>
-								<div class="primary-switch">
-									<input type="checkbox" id="default-switch">
-									<label for="default-switch"></label>
-								</div>
-							</div>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>02. Primary Color Switch</p>
-								<div class="primary-switch">
-									<input type="checkbox" id="primary-switch" checked>
-									<label for="primary-switch"></label>
-								</div>
-							</div>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>03. Confirm Color Switch</p>
-								<div class="confirm-switch">
-									<input type="checkbox" id="confirm-switch" checked>
-									<label for="confirm-switch"></label>
-								</div>
-							</div>
-						</div>
-						<div class="single-element-widget mt-30">
-							<h3 class="mb-30">Selectboxes</h3>
-							<div class="default-select" id="default-select"">
-										<select>
-											<option value=" 1">English</option>
-								<option value="1">Spanish</option>
-								<option value="1">Arabic</option>
-								<option value="1">Portuguise</option>
-								<option value="1">Bengali</option>
-								</select>
-							</div>
-						</div>
-						<div class="single-element-widget mt-30">
-							<h3 class="mb-30">Checkboxes</h3>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>01. Sample Checkbox</p>
-								<div class="primary-checkbox">
-									<input type="checkbox" id="default-checkbox">
-									<label for="default-checkbox"></label>
-								</div>
-							</div>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>02. Primary Color Checkbox</p>
-								<div class="primary-checkbox">
-									<input type="checkbox" id="primary-checkbox" checked>
-									<label for="primary-checkbox"></label>
-								</div>
-							</div>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>03. Confirm Color Checkbox</p>
-								<div class="confirm-checkbox">
-									<input type="checkbox" id="confirm-checkbox">
-									<label for="confirm-checkbox"></label>
-								</div>
-							</div>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>04. Disabled Checkbox</p>
-								<div class="disabled-checkbox">
-									<input type="checkbox" id="disabled-checkbox" disabled>
-									<label for="disabled-checkbox"></label>
-								</div>
-							</div>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>05. Disabled Checkbox active</p>
-								<div class="disabled-checkbox">
-									<input type="checkbox" id="disabled-checkbox-active" checked disabled>
-									<label for="disabled-checkbox-active"></label>
-								</div>
-							</div>
-						</div>
-						<div class="single-element-widget mt-30">
-							<h3 class="mb-30">Radios</h3>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>01. Sample radio</p>
-								<div class="primary-radio">
-									<input type="checkbox" id="default-radio">
-									<label for="default-radio"></label>
-								</div>
-							</div>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>02. Primary Color radio</p>
-								<div class="primary-radio">
-									<input type="checkbox" id="primary-radio" checked>
-									<label for="primary-radio"></label>
-								</div>
-							</div>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>03. Confirm Color radio</p>
-								<div class="confirm-radio">
-									<input type="checkbox" id="confirm-radio" checked>
-									<label for="confirm-radio"></label>
-								</div>
-							</div>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>04. Disabled radio</p>
-								<div class="disabled-radio">
-									<input type="checkbox" id="disabled-radio" disabled>
-									<label for="disabled-radio"></label>
-								</div>
-							</div>
-							<div class="switch-wrap d-flex justify-content-between">
-								<p>05. Disabled radio active</p>
-								<div class="disabled-radio">
-									<input type="checkbox" id="disabled-radio-active" checked disabled>
-									<label for="disabled-radio-active"></label>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 	<!-- End Align Area -->
 	
 		<!-- form itself end-->
