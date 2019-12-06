@@ -2,9 +2,10 @@
 #-*-coding:utf-8-*-
 
 
-from flask import Flask, request, url_for, render_template, make_response, redirect
+from flask import Flask, request, url_for, send_file,render_template, make_response, redirect
 import MySQLdb
 import hashlib
+import os
 app = Flask(__name__)
 
 
@@ -20,6 +21,28 @@ def get_name(ogrenci_no):
 	return username
 
 
+@app.route('/ilan_ekle', methods=['POST'])
+def ilan_ekle():
+	userno = request.cookies.get('username')
+	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
+	cursor = db.cursor()
+
+	firma_no = request.form['firma_no']
+	ilan_text = request.form['ilan_text']
+	ilan_tipi = request.form['ilan_tipi']
+	if(ilan_tipi == "staj"):
+		ilan_tipi = 0
+	elif(ilan_tipi == "standart"):
+		ilan_tipi = 1
+	else:
+		print("yanlışlık var...")
+	
+	print(firma_no, ilan_text, ilan_tipi, userno)
+	cursor.execute("insert into ilan(firma_fk, ilani_acan_fk, ilan_tipi, ilan_text) VALUES("+str(firma_no)+","+str(userno)+","+str(ilan_tipi)+", '"+str(ilan_text)+"')")
+	db.commit()	
+	
+	db.close()
+	return redirect(url_for('anasayfa'))
 
 @app.route('/anket_atama', methods=['GET'])
 def anket_atama():	
@@ -50,6 +73,22 @@ def anket_atama():
 	return redirect(url_for('admin'))
 
 
+
+@app.route('/cv_indir', methods=['GET'])
+def cv_indir():
+	
+	if(request.cookies.get('username') == None):
+		return redirect(url_for('index'))
+	
+	username = request.cookies.get('username')
+	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
+	cursor = db.cursor()
+	os.remove("/var/lib/mysql-files/cv.txt")
+	cursor.execute("SELECT * from mezun where ogrenci_no='"+str(username)+"' into outfile '/var/lib/mysql-files/cv.txt';")
+	cv = cursor.fetchone()
+	db.close()
+	return send_file("/var/lib/mysql-files/cv.txt", as_attachment=True)
+	
 
 @app.route('/admin')
 def admin():
@@ -122,11 +161,23 @@ def mezunlar():
 			ogrenci_no1 = 0
 		page_number=0
 
-
-
 	db = MySQLdb.connect("localhost","misafir","misafir","mebsis" ,charset='utf8', init_command='SET NAMES UTF8')
 	cursor = db.cursor()
-
+	if(request.args.get('isim') != None):
+		aranan_isim = str(request.args.get('isim'))
+		cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun WHERE isim LIKE '%"+str(aranan_isim)+"%';")
+		kullanicilar = cursor.fetchall()
+		kullanicilar = list(map(list, kullanicilar))
+		if(request.cookies.get('username') == None):
+			username = None
+		else:
+			username = request.cookies.get('username')
+			cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(username)+";")
+			username = cursor.fetchone()
+			username = username[0].capitalize().decode('utf8')
+	
+		return render_template('elements.html', username=username, ogrenci_no=request.cookies.get('username'),data=kullanicilar, len=len(kullanicilar), page_number=0,current_page=0,
+											low_limit=0, high_limit=0)
 
 	if(ogrenci_no1 == None):
 		ogrenci_no1 = 0
@@ -157,6 +208,9 @@ def mezunlar():
 		cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(username)+";")
 		username = cursor.fetchone()
 		username = username[0].capitalize().decode('utf8')
+	
+
+	
 	db.close()
 	return render_template('elements.html', username=username, ogrenci_no=request.cookies.get('username'),data=rows, len=len(rows), page_number=page_number,current_page=current_page,
 											low_limit=low_limit, high_limit=high_limit)
@@ -217,7 +271,8 @@ def anasayfa():
 	cursor.execute("select yorum_text, ilan_id_fk, yorum_tarihi,ogrenci_id_fk from yorum where ilan_id_fk IN (" + ','.join(map(str, yorumlar)) +")")
 	yorumlar = cursor.fetchall()
 	db.close()
-	return render_template('anasayfa.html',anket_flag=anket_flag,yorumlar=yorumlar, yorum_len=len(yorumlar), aktif=False,ilanlar=ilanlar, len=len(ilanlar), username=username,ogrenci_no=userno)
+	ilan_flag = False
+	return render_template('anasayfa.html',ilan_flag=ilan_flag,anket_flag=anket_flag,yorumlar=yorumlar, yorum_len=len(yorumlar), aktif=False,ilanlar=ilanlar, len=len(ilanlar), username=username,ogrenci_no=userno)
 
 
 @app.route('/ilan')
@@ -236,20 +291,53 @@ def ilan():
 	db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8' )
 	cursor = db.cursor()
 	
-	if(request.args.get('ilan_no') != None):
+	
+	# Tekil ve sabit ilanlar
+	
+
+	if(request.args.get('ilan_no') != None and request.args.get('ilan_no') != ""):
 		ilan_no = str(request.args.get('ilan_no'))
-		cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun WHERE ogrenci_no IN (select ilani_acan_fk from ilan where ilan_id='"+ilan_no+"');")
+		cursor.execute("SELECT isim, soyad, ogrenci_no FROM mezun WHERE ogrenci_no LIKE (select ilani_acan_fk from ilan where ilan_id='"+ilan_no+"');")
+		
 		ilanlar = cursor.fetchall()
 		ilanlar = list(map(list, ilanlar))
-		return render_template('anasayfa.html',anket_flag=False, aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+		ilan_flag = True
+		return render_template('anasayfa.html', ilan_flag=ilan_flag,anket_flag=False, yorum_len=0,aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+
+
+	
+	if(request.args.get('sehir') != None and request.args.get('sehir') != ""):
+		ilan_sehir = str(request.args.get('sehir'))
+		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilan_text LIKE '%"+ilan_sehir+"%';")
+		ilanlar = cursor.fetchall()
+		ilanlar = list(map(list, ilanlar))
+		ilan_flag = True
+		return render_template('anasayfa.html', ilan_flag=ilan_flag,anket_flag=False, yorum_len=0,aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+		
+
+
+	if(request.args.get('ogrenci_no') != None and request.args.get('ogrenci_no') != ""):
+		ilan_ogrenci_no = str(request.args.get('ogrenci_no'))
+		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE mezun.ogrenci_no="+ilan_ogrenci_no+";")
+		ilanlar = cursor.fetchall()
+		ilanlar = list(map(list, ilanlar))
+		ilan_flag = True
+		return render_template('anasayfa.html', ilan_flag=ilan_flag,anket_flag=False, yorum_len=0,aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+	
+	if(request.args.get('isim') != None and request.args.get('isim') != ""):
+		isim = str(request.args.get('isim'))
+		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE mezun.isim LIKE '%"+isim+"%';")
+		ilanlar = cursor.fetchall()
+		ilanlar = list(map(list, ilanlar))
+		ilan_flag = True
+		return render_template('anasayfa.html', ilan_flag=ilan_flag,anket_flag=False, yorum_len=0,aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+		
 	
 	if(ilan_turu == None):
 		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk;")
 	else:
 		cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id,acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan_tipi='"+str(ilan_turu)+"';")
-	
-	
-	
+
 	ilanlar = cursor.fetchall() # Mezunlardaki gibi pagination yap.
 	ilanlar = list(map(list, ilanlar))
 	
@@ -260,7 +348,8 @@ def ilan():
 	cursor.execute("select yorum_text, ilan_id_fk, yorum_tarihi,ogrenci_id_fk from yorum where ilan_id_fk IN (" + ','.join(map(str, yorumlar)) +")")
 	yorumlar = cursor.fetchall()
 	db.close()
-	return render_template('anasayfa.html',anket_flag=False,yorumlar=yorumlar, yorum_len=len(yorumlar), aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
+	ilan_flag = True
+	return render_template('anasayfa.html',ilan_flag=ilan_flag,anket_flag=False,yorumlar=yorumlar, yorum_len=len(yorumlar), aktif=True,ilanlar=ilanlar, len=len(ilanlar),username=username,ogrenci_no=userno)
 
 
 
