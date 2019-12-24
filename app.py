@@ -109,8 +109,11 @@ def admin():
 		rows.append(row)
 	cursor.execute("SELECT AVG(YEAR(ise_baslama_tarihi) - bitirme_tarihi) from mezun where ise_baslama_tarihi IS NOT NULL")
 	ortalama = cursor.fetchall()
+	
+	cursor.execute("SELECT isim, soyad, ogrenci_no, count(*) FROM mezun INNER JOIN ilan on mezun.ogrenci_no=ilan.ilani_acan_fk GROUP BY ilan.ilani_acan_fk ORDER BY count(*) desc;")
+	en_cok_ilan = cursor.fetchmany(10)
 	db.close()	
-	return render_template('admin.html', ortalama=int(ortalama[0][0]), anket_len=len(rows),anket_data=rows,data=data, len=len(data))
+	return render_template('admin.html', en_cok_ilan_len = len(en_cok_ilan), en_cok_ilan = en_cok_ilan,ortalama=int(ortalama[0][0]), anket_len=len(rows),anket_data=rows,data=data, len=len(data))
 
 	#cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
 
