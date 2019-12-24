@@ -51,7 +51,10 @@
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
     <![endif]-->
  
-
+<div class="whole-wrap">
+		<div class="container box_1170">
+			<div class="section-top-border">
+				
 			<div class="section-top-border">
 
 
@@ -66,7 +69,7 @@
 
 			{% for i in range(0, len) %} 
 
-					<div class="table-row" onClick="document.forms['mezun_ara{{i}}'].submit();" >
+					<div class="table-row" >
 					
 						<div class="serial">{{data[i][0]}}</div>
 						<div class="serial">{{data[i][1]}}</div>
@@ -77,6 +80,8 @@
 			{% endfor %}
 
 
+					</div>
+					</div>
 					</div>
 					</div>
 					
@@ -106,6 +111,32 @@ Anket atanan mezunar;
 Ortalama işe girme süresi; {{ ortalama }}
 
 </div>
+
+				<div class="progress-table-wrap">
+					<div class="progress-table">
+						<div class="table-head">
+							<div class="serial">İlan Sayısı</div>
+							<div class="serial">İsim</div>
+							<div class="serial">Soyad</div>
+						</div>
+
+
+			{% for i in range(0, en_cok_ilan_len) %} 
+
+					<div class="table-row" >
+					
+						<div class="serial">{{en_cok_ilan[i][3]}}</div>
+						<div class="serial">{{en_cok_ilan[i][0]}}</div>
+						<div class="serial">{{en_cok_ilan[i][1]}}</div>
+						<div class="serial">{{en_cok_ilan[i][2]}}</div>
+					</div>
+
+			{% endfor %}
+
+
+					</div>
+					</div>
+
 
 
 
