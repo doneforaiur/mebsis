@@ -113,11 +113,14 @@ Ortalama işe girme süresi; {{ ortalama }}
 </div>
 
 				<div class="progress-table-wrap">
+											En çok ilan vermiş mezunlar;
 					<div class="progress-table">
 						<div class="table-head">
+						
 							<div class="serial">İlan Sayısı</div>
 							<div class="serial">İsim</div>
 							<div class="serial">Soyad</div>
+							<div class="serial">Öğrenci Numarası</div>
 						</div>
 
 
@@ -136,6 +139,74 @@ Ortalama işe girme süresi; {{ ortalama }}
 
 					</div>
 					</div>
+
+
+<br><br><br>
+
+				<div class="progress-table-wrap">
+											En çok çalışılan alan;
+					<div class="progress-table">
+						<div class="table-head">
+						
+							<div class="serial">Alan Adı</div>
+							<div class="serial">Çalışan Sayısı</div>
+						</div>
+
+
+			{% for i in range(0, calisma_len) %} 
+
+					<div class="table-row" >
+					
+						<div class="serial">{{calisma_alani[i][0]}}</div>
+						<div class="serial">{{calisma_alani[i][1]}}</div>
+					</div>
+
+			{% endfor %}
+
+
+					</div>
+					</div>
+
+
+
+
+					<br><br> Firma ekleme;
+						<form name="firma_ekle" id="firma_ekle" action="/firma_ekle" method="POST">
+							<div class="mt-10">
+								<input type="text" id="iletisim" name="iletisim" placeholder="İletisim"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'İletisim'" 
+									class="single-input">
+							</div>
+							<div class="mt-10">
+								<input type="text" id="adres" name="adres" placeholder="Adres"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'Adres'" 
+									class="single-input">
+							</div>
+							<div class="mt-10">
+								<input type="text" id="e_posta" name="e_posta" placeholder="E-posta adresi"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'E-posta adresi'" 
+									class="single-input">
+							</div>
+							<div class="mt-10">
+								<input type="text" id="ticari_sicil" name="ticari_sicil" placeholder="Ticari Sicil No"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'Ticari Sicil No'"
+									class="single-input">
+							</div>
+							
+							<div class="mt-10">
+								<input type="text" id="unvan" name="unvan" placeholder="Şirketin Ünvanı"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'Şirketin Ünvanı'"
+									class="single-input">
+							</div>
+							<div class="mt-10">
+								<input type="text" id="sorumlu_kisi" name="sorumlu_kisi" placeholder="Sorumlu Kişi"
+									onfocus="this.placeholder = ''" onblur="this.placeholder = 'Sorumlu Kişi'"
+									class="single-input">
+							</div>
+							
+			
+							<button onClick="document.forms['firma_ekle'].submit();" class="genric-btn primary circle">Firma Ekle</button>
+						</form>
 
 
 

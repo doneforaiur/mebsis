@@ -73,7 +73,30 @@ def anket_atama():
 	return redirect(url_for('admin'))
 
 
+@app.route('/firma_ekle', methods=['GET', 'POST'])
+def firma_ekle():
+	if request.method == 'POST':
+		db = MySQLdb.connect("localhost","misafir","misafir","mebsis",charset='utf8', init_command='SET NAMES UTF8')
+		cursor = db.cursor()
+		print("test?")
+		iletisim = str(request.form['iletisim'])
+		print("test?")
+		adres = str(request.form['adres'])
+		print("test?")
+		eposta = str(request.form['e_posta'])
+		print("test?")
+		ticari_sicil_no = str(request.form['ticari_sicil'])
+		print("test?")
+		unvan = str(request.form['unvan'])
+		print("test?")
+		sorumlu_kisi = str(request.form['sorumlu_kisi'])
+		print("test?")
+		cursor.execute("INSERT INTO firma(iletisim, adres, eposta, ticari_sicil, unvan, sorumlu_kisi) VALUES('"+iletisim+"','"+adres+"','"+eposta+"','"+ticari_sicil_no+"','"+unvan+"','"+sorumlu_kisi+"')")
+		db.commit()
 
+		db.close()
+		return redirect(url_for('admin'))
+	
 @app.route('/cv_indir', methods=['GET'])
 def cv_indir():
 	
@@ -112,8 +135,12 @@ def admin():
 	
 	cursor.execute("SELECT isim, soyad, ogrenci_no, count(*) FROM mezun INNER JOIN ilan on mezun.ogrenci_no=ilan.ilani_acan_fk GROUP BY ilan.ilani_acan_fk ORDER BY count(*) desc;")
 	en_cok_ilan = cursor.fetchmany(10)
+	
+	cursor.execute("SELECT calisma_alani, count(*) FROM mezun where calisma_alani IS NOT NULL group by calisma_alani ORDER BY count(*) desc;")
+	calisma_alani = cursor.fetchmany(20)
+	
 	db.close()	
-	return render_template('admin.html', en_cok_ilan_len = len(en_cok_ilan), en_cok_ilan = en_cok_ilan,ortalama=int(ortalama[0][0]), anket_len=len(rows),anket_data=rows,data=data, len=len(data))
+	return render_template('admin.html', calisma_alani=calisma_alani, calisma_len = len(calisma_alani), en_cok_ilan_len = len(en_cok_ilan), en_cok_ilan = en_cok_ilan,ortalama=int(ortalama[0][0]), anket_len=len(rows),anket_data=rows,data=data, len=len(data))
 
 	#cursor.execute("SELECT isim, soyad, ogrenci_no, ilan_id, acilma_tarihi FROM mezun RIGHT JOIN ilan ON mezun.ogrenci_no=ilan.ilani_acan_fk WHERE ilan.ilani_acan_fk IN (SELECT following_id from takip where follower_id='"+str(userno)+"');")
 
@@ -210,10 +237,7 @@ def mezunlar():
 		username = request.cookies.get('username')
 		cursor.execute("SELECT isim from mezun where ogrenci_no=" +str(username)+";")
 		username = cursor.fetchone()
-		username = username[0].capitalize().decode('utf8')
-	
-
-	
+		username = username[0].capitalize().decode('utf8')	
 	db.close()
 	return render_template('elements.html', username=username, ogrenci_no=request.cookies.get('username'),data=rows, len=len(rows), page_number=page_number,current_page=current_page,
 											low_limit=low_limit, high_limit=high_limit)
